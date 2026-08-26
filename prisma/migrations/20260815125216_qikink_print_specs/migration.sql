@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "ProductVariant" ADD COLUMN     "designHeightInches" DOUBLE PRECISION NOT NULL DEFAULT 12,
+ADD COLUMN     "designWidthInches" DOUBLE PRECISION NOT NULL DEFAULT 10,
+ADD COLUMN     "printPlacement" TEXT NOT NULL DEFAULT 'fr',
+ADD COLUMN     "printTypeId" INTEGER NOT NULL DEFAULT 1;

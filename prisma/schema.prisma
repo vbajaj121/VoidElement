@@ -1,0 +1,268 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum FulfillmentProviderName {
+  PRINTROVE
+  PRINTIFY
+  QIKINK
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum OtpPurpose {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(CUSTOMER)
+  password      String?
+
+  accounts Account[]
+  sessions Session[]
+  orders   Order[]
+  designs  Design[]
+  addresses Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  userId     String
+  fullName   String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  phone      String?
+  isDefault  Boolean @default(false)
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Order Order[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String
+  description String   @db.Text
+  basePrice   Int
+  currency    String   @default("INR")
+  /// Gradient stand-in for photography: a [from, to] hex tuple, see ProductArt.
+  colors      Json
+  isLimited   Boolean  @default(false)
+  isPublished Boolean  @default(false)
+
+  images   ProductImage[]
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  position  Int     @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id        String @id @default(cuid())
+  productId String
+  sku       String @unique
+  color     String
+  /// Hex swatch chip for this variant's color option.
+  swatch    String
+  /// Gradient stand-in for photography: a [from, to] hex tuple, see ProductArt.
+  colors    Json
+  size      String
+  priceDiff Int    @default(0)
+  stock     Int    @default(0)
+
+  providerName   FulfillmentProviderName?
+  providerSku    String?
+
+  /// Qikink print_type_id: 1=DTG, 2=All-over, 3=Embroidery, 5=Accessories, 6=Puff, 7=Glow-in-dark, 12-15=Vinyl, 17=DTF.
+  printTypeId       Int    @default(1)
+  /// Qikink placement_sku: "fr" | "bk" | "lp" | "rp" | "rs" | "ls".
+  printPlacement    String @default("fr")
+  designWidthInches Float  @default(10)
+  designHeightInches Float @default(12)
+  /// Publicly-reachable URL of the print-ready design file for this variant (design_link/mockup_link). Placeholder-generated for now — see prisma/seed.ts.
+  printFileUrl      String?
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  designs    Design[]
+}
+
+model Design {
+  id         String   @id @default(cuid())
+  userId     String
+  variantId  String
+  name       String   @default("Untitled design")
+  frontUrl   String?
+  backUrl    String?
+  sleeveUrl  String?
+  layersJson Json
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Coupon {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  percentOff     Int?
+  amountOff      Int?
+  maxRedemptions Int?
+  timesRedeemed  Int      @default(0)
+  expiresAt      DateTime?
+  isActive       Boolean  @default(true)
+
+  orders Order[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  status          OrderStatus @default(PENDING_PAYMENT)
+  subtotal        Int
+  discount        Int         @default(0)
+  shippingCost    Int         @default(0)
+  total           Int
+  currency        String      @default("INR")
+
+  addressId String?
+  couponId  String?
+
+  razorpayOrderId   String? @unique
+  razorpayPaymentId String? @unique
+
+  providerName   FulfillmentProviderName?
+  providerOrderId String?
+  trackingUrl     String?
+
+  user    User     @relation(fields: [userId], references: [id])
+  address Address? @relation(fields: [addressId], references: [id])
+  coupon  Coupon?  @relation(fields: [couponId], references: [id])
+  items   OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id           String @id @default(cuid())
+  orderId      String
+  variantId    String
+  designId     String?
+  quantity     Int
+  unitPrice    Int
+  printFileUrl String?
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model OtpCode {
+  id         String     @id @default(cuid())
+  identifier String
+  codeHash   String
+  purpose    OtpPurpose
+  attempts   Int        @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([identifier, purpose])
+}
+
+model Settings {
+  id                     String                  @id @default("global")
+  activeFulfillmentProvider FulfillmentProviderName @default(PRINTROVE)
+  updatedAt              DateTime                @updatedAt
+}
+
+/// One row per editable marketing-content section (id = section key, e.g.
+/// "hero", "testimonials", "page-about"). Shape of `data` is defined by a
+/// Zod schema per section in src/lib/validation/site-content.ts, not
+/// DB-enforced — same pattern as Product.colors/ProductVariant.colors.
+/// Missing rows fall back to DEFAULT_CONTENT in code, so the site never
+/// breaks before an admin has edited anything.
+model SiteContent {
+  id        String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+}
