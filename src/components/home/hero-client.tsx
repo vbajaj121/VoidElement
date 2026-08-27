@@ -88,7 +88,12 @@ export function HeroClient({ content }: { content: HeroContent }) {
         onClick={scrollToNext}
         data-cursor="text"
         data-cursor-label="Scroll"
-        className="absolute inset-x-0 bottom-8 z-10 flex flex-col items-center gap-2 text-warm-grey"
+        // `left-1/2 -translate-x-1/2` instead of `inset-x-0` — inset-x-0
+        // stretched the button's actual hit box to the full viewport width
+        // (only its centered text was ever visible), an invisible tap strip
+        // sitting under whatever's above it. This keeps the same visual
+        // centering while shrinking the clickable area to the content itself.
+        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-warm-grey"
       >
         <Caption className="tracking-[0.3em] uppercase">{content.scrollHint}</Caption>
         <ChevronDown className="animate-bounce" size={20} strokeWidth={1.5} />

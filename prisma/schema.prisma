@@ -256,7 +256,7 @@ model Settings {
 }
 
 /// One row per editable marketing-content section (id = section key, e.g.
-/// "hero", "testimonials", "page-about"). Shape of `data` is defined by a
+/// "hero", "footer", "page-about"). Shape of `data` is defined by a
 /// Zod schema per section in src/lib/validation/site-content.ts, not
 /// DB-enforced — same pattern as Product.colors/ProductVariant.colors.
 /// Missing rows fall back to DEFAULT_CONTENT in code, so the site never
@@ -265,4 +265,10 @@ model SiteContent {
   id        String   @id
   data      Json
   updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

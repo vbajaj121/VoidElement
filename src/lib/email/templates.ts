@@ -46,6 +46,13 @@ export function orderConfirmationEmailTemplate(input: {
   )
 }
 
+export function newsletterWelcomeEmailTemplate() {
+  return shell(
+    "You're on the list.",
+    `<p style="color:#c9c9c9;font-size:15px;line-height:1.6;margin:0 0 24px;">No spam, just a heads-up before each limited run goes live — you'll hear from us the moment the next drop opens.</p>`
+  )
+}
+
 export function shippingUpdateEmailTemplate(input: {
   orderId: string
   status: string
