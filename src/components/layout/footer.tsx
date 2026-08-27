@@ -10,9 +10,14 @@ export async function Footer() {
 
   return (
     <footer className="border-border border-t">
-      <Container className="py-16">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-2">
+      <Container className="py-12 sm:py-16">
+        {/* grid-cols-2 on mobile instead of every block fully stacked (which
+            ran to nearly two screens of scrolling) — the logo spans both
+            columns as its own full-width row, and the 3 link columns wrap
+            2-per-row beneath it. At lg the logo drops back to sitting beside
+            the columns in one row, same as before. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-12 lg:grid-cols-5">
+          <div className="col-span-2 lg:col-span-2">
             <Link href="/" data-cursor="hover">
               <Logo />
             </Link>
@@ -52,7 +57,7 @@ export async function Footer() {
           ))}
         </div>
 
-        <div className="border-border mt-16 flex flex-col gap-2 border-t pt-6 sm:flex-row sm:justify-between">
+        <div className="border-border mt-12 flex flex-col gap-2 border-t pt-6 sm:mt-16 sm:flex-row sm:justify-between">
           <Caption>© {new Date().getFullYear()} Void Element. All rights reserved.</Caption>
           <Caption>{content.bottomTagline}</Caption>
         </div>
