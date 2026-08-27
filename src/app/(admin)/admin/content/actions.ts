@@ -13,7 +13,6 @@ const PUBLIC_PATHS_BY_SECTION: Record<SiteContentSection, string[]> = {
   process: ['/'],
   'product-showcase': ['/'],
   'limited-edition': ['/'],
-  testimonials: ['/'],
   'trust-bar': ['/'],
   newsletter: ['/'],
   footer: ['/'],

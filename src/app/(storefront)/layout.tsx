@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CartDrawer } from "@/components/commerce/cart-drawer";
-import { SearchPalette } from "@/components/commerce/search-palette";
+import { SearchPaletteLoader } from "@/components/commerce/search-palette-loader";
 import { getProducts } from "@/lib/data/products.server";
 
 export default async function StorefrontLayout({
@@ -18,7 +18,7 @@ export default async function StorefrontLayout({
       {children}
       <Footer />
       <CartDrawer />
-      <SearchPalette products={products} />
+      <SearchPaletteLoader products={products} />
     </>
   );
 }

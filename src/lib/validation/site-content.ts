@@ -132,40 +132,6 @@ const limitedEditionDefault: LimitedEditionContent = {
   productSlug: "oversized-tee",
 }
 
-// ---- testimonials ----
-export const testimonialItemSchema = z.object({
-  quote: z.string().min(1),
-  name: z.string().min(1),
-  role: z.string().min(1),
-})
-export const testimonialsContentSchema = z.object({
-  eyebrow: z.string().min(1),
-  heading: z.string().min(1),
-  items: z.array(testimonialItemSchema).min(1, "Add at least one testimonial"),
-})
-export type TestimonialsContent = z.infer<typeof testimonialsContentSchema>
-const testimonialsDefault: TestimonialsContent = {
-  eyebrow: "Word On The Street",
-  heading: "From the people wearing it.",
-  items: [
-    {
-      quote: "The fit is exactly what the size guide promised, and the print hasn't cracked after a dozen washes.",
-      name: "R.",
-      role: "Verified Buyer",
-    },
-    {
-      quote: "Didn't expect a hoodie at this weight for the price. Feels like it costs twice as much.",
-      name: "A.",
-      role: "Verified Buyer",
-    },
-    {
-      quote: "Ordered the numbered bomber. Mine says 014/150 — small detail, big difference.",
-      name: "K.",
-      role: "Verified Buyer",
-    },
-  ],
-}
-
 // ---- trust-bar ----
 export const TRUST_BAR_ICONS = [
   "shield-check",
@@ -448,7 +414,6 @@ export const SITE_CONTENT_SECTIONS = {
     schema: limitedEditionContentSchema,
     default: limitedEditionDefault,
   },
-  testimonials: { label: "Testimonials", schema: testimonialsContentSchema, default: testimonialsDefault },
   "trust-bar": { label: "Trust Bar", schema: trustBarContentSchema, default: trustBarDefault },
   newsletter: { label: "Newsletter", schema: newsletterContentSchema, default: newsletterDefault },
   footer: { label: "Footer", schema: footerContentSchema, default: footerDefault },

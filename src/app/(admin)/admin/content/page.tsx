@@ -9,12 +9,11 @@ export const metadata: Metadata = { title: "Content · Admin" }
 const HOMEPAGE_SECTIONS: { key: SiteContentSection; blurb: string }[] = [
   { key: "hero", blurb: "Banner image, headline, and the two hero buttons." },
   { key: "explore-collections", blurb: "Heading above the category grid." },
-  { key: "process", blurb: "The five-step \"how it's made\" section." },
   { key: "product-showcase", blurb: "Heading above the featured product grid." },
   { key: "limited-edition", blurb: "The single-product spotlight callout." },
-  { key: "testimonials", blurb: "Customer quotes." },
-  { key: "trust-bar", blurb: "The four icon+text badges." },
+  { key: "process", blurb: "The five-step \"how it's made\" section." },
   { key: "newsletter", blurb: "Email signup copy." },
+  { key: "trust-bar", blurb: "The four icon+text badges." },
   { key: "footer", blurb: "Footer columns, links, and social URLs." },
 ]
 
