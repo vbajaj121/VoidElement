@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useLenis } from "lenis/react"
 import { Menu, Search, ShoppingBag, User } from "lucide-react"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Logo } from "@/components/brand/logo"
@@ -26,9 +25,14 @@ export function Navbar() {
   const openCart = useCart((s) => s.open)
   const openSearch = useSearchStore((s) => s.open)
 
-  useLenis(({ scroll }) => {
-    setScrolled(scroll > 40)
-  })
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 40)
+    }
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
     <header
