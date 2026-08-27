@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { m } from "framer-motion"
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
@@ -15,6 +16,25 @@ import type { HeroContent } from "@/lib/validation/site-content"
 export function HeroClient({ content }: { content: HeroContent }) {
   const { x, y } = useParallax(24)
 
+  // Mouse-driven parallax can never do anything on a touch device (there's no
+  // mousemove to react to — x/y just sit at 0 forever), but the motion.div
+  // wrapper still applies a CSS transform for it, and AuroraBackground itself
+  // runs a continuous CSS animation through a 120px blur — one of the most
+  // GPU-expensive effects a browser renders. Both sit directly under the
+  // fixed navbar, the exact area where taps on the menu/cart buttons were
+  // reported as unreliable, and on real (especially mid-range Android)
+  // mobile hardware that's a plausible source of genuine input jank for a
+  // purely decorative desktop nicety. Skip both entirely on coarse-pointer/
+  // touch devices — same detection CustomCursor already uses.
+  const [finePointer, setFinePointer] = useState(false)
+  useEffect(() => {
+    // matchMedia is unavailable during SSR, so this can only be known
+    // client-side — the one-extra-render-on-mount tradeoff is unavoidable
+    // here (same pattern as CustomCursor's pointer-type detection).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFinePointer(window.matchMedia("(pointer: fine)").matches)
+  }, [])
+
   function scrollToNext() {
     document.querySelector("#explore-collections")?.scrollIntoView({ behavior: "smooth" })
   }
@@ -26,9 +46,11 @@ export function HeroClient({ content }: { content: HeroContent }) {
     // user's first scroll, which shifts this section's height mid-gesture.
     // dvh tracks the live viewport instead, so there's nothing to correct.
     <section className="relative h-dvh w-full overflow-hidden">
-      <m.div style={{ x, y }} className="pointer-events-none absolute inset-0">
-        <AuroraBackground className="-top-1/4 left-1/2 -translate-x-1/2 opacity-[0.12]" />
-      </m.div>
+      {finePointer && (
+        <m.div style={{ x, y }} className="pointer-events-none absolute inset-0">
+          <AuroraBackground className="-top-1/4 left-1/2 -translate-x-1/2 opacity-[0.12]" />
+        </m.div>
+      )}
 
       <HeroVisual bannerImageUrl={content.bannerImageUrl} />
 
