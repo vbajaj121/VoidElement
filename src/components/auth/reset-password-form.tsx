@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Heading, Caption } from "@/components/ui/typography"
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/auth"
-import { resetPasswordWithOtp } from "@/app/(auth)/actions"
+import { resetPasswordWithOtp } from "@/app/(storefront)/(auth)/actions"
 
 export function ResetPasswordForm({ email }: { email: string }) {
   const router = useRouter()

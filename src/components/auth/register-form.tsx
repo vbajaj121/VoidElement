@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Heading, Body, Caption } from "@/components/ui/typography"
 import { registerSchema, type RegisterInput } from "@/lib/validation/auth"
-import { registerUser } from "@/app/(auth)/actions"
+import { registerUser } from "@/app/(storefront)/(auth)/actions"
 
 export function RegisterForm() {
   const router = useRouter()

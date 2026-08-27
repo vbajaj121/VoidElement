@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Heading, Body } from "@/components/ui/typography"
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validation/auth"
-import { requestPasswordReset } from "@/app/(auth)/actions"
+import { requestPasswordReset } from "@/app/(storefront)/(auth)/actions"
 
 export function ForgotPasswordForm() {
   const router = useRouter()

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Heading, Body, Caption } from "@/components/ui/typography"
 import { otpVerifySchema, type OtpVerifyInput } from "@/lib/validation/auth"
-import { verifyEmailOtp, resendVerificationOtp } from "@/app/(auth)/actions"
+import { verifyEmailOtp, resendVerificationOtp } from "@/app/(storefront)/(auth)/actions"
 
 export function VerifyForm({ email }: { email: string }) {
   const router = useRouter()

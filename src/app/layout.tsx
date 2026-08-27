@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
 import { CustomCursorLoader } from "@/components/motion/custom-cursor-loader";
 import { LazyMotionProvider } from "@/components/motion/lazy-motion-provider";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { CartDrawer } from "@/components/commerce/cart-drawer";
-import { SearchPalette } from "@/components/commerce/search-palette";
-import { getProducts } from "@/lib/data/products.server";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -56,20 +50,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+// No Dynamic APIs (headers/cookies) here on purpose — the (admin) and
+// (storefront) route groups used to be told apart at request time via a
+// `headers()` read of an `x-pathname` header set in proxy.ts, but that
+// forced every single page in the app into fully dynamic, server-rendered-
+// per-request mode (a Dynamic API anywhere in a route's tree opts the whole
+// route out of static rendering). Storefront chrome (Navbar/Footer/etc.) now
+// lives in `(storefront)/layout.tsx` instead — a route group can only ADD
+// wrapping relative to its parent, never remove it, so the only way to give
+// (admin) and (storefront) genuinely different top-level UI without a
+// Dynamic API is to keep this shared root layout down to universally-needed
+// providers only, and let the group-level layouts diverge from there.
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Set by src/proxy.ts. The admin backend gets none of the storefront
-  // chrome — the navbar is `fixed`, so on admin pages it was overlapping
-  // page content and swallowing clicks on anything underneath it.
-  const pathname = (await headers()).get("x-pathname") ?? "";
-  const isAdmin = pathname.startsWith("/admin");
-
-  // Search palette is non-essential; don't take the whole site down if the DB hiccups.
-  const products = isAdmin ? [] : await getProducts().catch(() => []);
-
   return (
     <html
       lang="en"
@@ -78,13 +74,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <LazyMotionProvider>
           <SmoothScrollProvider>
-            <TooltipProvider delay={150}>
-              {!isAdmin && <Navbar />}
-              {children}
-              {!isAdmin && <Footer />}
-              {!isAdmin && <CartDrawer />}
-              {!isAdmin && <SearchPalette products={products} />}
-            </TooltipProvider>
+            <TooltipProvider delay={150}>{children}</TooltipProvider>
           </SmoothScrollProvider>
           <CustomCursorLoader />
         </LazyMotionProvider>

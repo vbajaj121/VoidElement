@@ -5,7 +5,7 @@ import Script from "next/script"
 import { Button } from "@/components/ui/button"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Caption } from "@/components/ui/typography"
-import { verifyRazorpayPayment } from "@/app/checkout/actions"
+import { verifyRazorpayPayment } from "@/app/(storefront)/checkout/actions"
 
 declare global {
   interface Window {

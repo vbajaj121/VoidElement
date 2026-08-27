@@ -13,7 +13,7 @@ import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Heading, Body, Caption, Subheading } from "@/components/ui/typography"
 import { useCart } from "@/lib/store/cart"
 import type { CheckoutInput } from "@/lib/validation/checkout"
-import { createOrder, confirmMockPayment } from "@/app/checkout/actions"
+import { createOrder, confirmMockPayment } from "@/app/(storefront)/checkout/actions"
 
 export function CheckoutClient() {
   const lines = useCart((s) => s.lines)
