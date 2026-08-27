@@ -36,8 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
-# claude code local settings — can contain secrets logged in permission rules
+# claude code local settings/session state — machine-local, can contain
+# secrets logged in permission rules
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # typescript
 *.tsbuildinfo
