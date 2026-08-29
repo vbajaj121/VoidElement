@@ -31,16 +31,24 @@ export function ImageUploadField({
     if (!file) return
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append("file", file)
-    const result = await uploadAction(formData)
-    setUploading(false)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      const result = await uploadAction(formData)
 
-    if (!result.ok) {
-      toast.error(result.error)
-      return
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
+      onChange(result.url)
+    } catch {
+      // A framework-level failure (e.g. the request body exceeding Next's
+      // server-action size limit) rejects instead of returning {ok:false} —
+      // without this the button would be stuck on "Uploading…" forever.
+      toast.error("Upload failed. The file may be too large — try a smaller image.")
+    } finally {
+      setUploading(false)
     }
-    onChange(result.url)
   }
 
   return (
