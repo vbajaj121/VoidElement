@@ -62,24 +62,29 @@ export function ProductForm({
 
   async function onSubmit(values: ProductFormValues) {
     setSubmitting(true)
-    const result = await saveProduct(productId, {
-      ...values,
-      basePrice: Number(values.basePrice),
-      variants: values.variants.map((v) => ({
-        ...v,
-        priceDiff: Number(v.priceDiff),
-        stock: Number(v.stock),
-      })),
-      images: images.filter((img) => img.url),
-    })
-    setSubmitting(false)
+    try {
+      const result = await saveProduct(productId, {
+        ...values,
+        basePrice: Number(values.basePrice),
+        variants: values.variants.map((v) => ({
+          ...v,
+          priceDiff: Number(v.priceDiff),
+          stock: Number(v.stock),
+        })),
+        images: images.filter((img) => img.url),
+      })
 
-    if (!result.ok) {
-      toast.error(result.error)
-      return
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
+      toast.success("Product saved.")
+      router.push("/admin/products")
+    } catch {
+      toast.error("Something went wrong. Try again.")
+    } finally {
+      setSubmitting(false)
     }
-    toast.success("Product saved.")
-    router.push("/admin/products")
   }
 
   async function onDelete() {

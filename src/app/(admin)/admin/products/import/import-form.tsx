@@ -87,28 +87,36 @@ export function ImportForm() {
       setStatuses((s) => ({ ...s, [i]: { status: "submitting" } }))
 
       const basePrice = Math.round((product.variants[0]?.price ?? 0) * 100)
-      const result = await createProductFromImport({
-        slug: product.slug,
-        title: product.title,
-        category: product.category,
-        description: product.description,
-        basePrice,
-        currency: "INR",
-        isLimited: product.isLimited,
-        variants: product.variants.map((v) => ({
-          color: v.color,
-          size: v.size,
-          providerSku: v.providerSku,
-          priceDiff: Math.round(v.price * 100) - basePrice,
-        })),
-        images: (imagesByIndex[i] ?? []).filter((img) => img.url),
-      })
 
-      if (result.ok) {
-        anySucceeded = true
-        setStatuses((s) => ({ ...s, [i]: { status: "done" } }))
-      } else {
-        setStatuses((s) => ({ ...s, [i]: { status: "error", error: result.error } }))
+      try {
+        const result = await createProductFromImport({
+          slug: product.slug,
+          title: product.title,
+          category: product.category,
+          description: product.description,
+          basePrice,
+          currency: "INR",
+          isLimited: product.isLimited,
+          variants: product.variants.map((v) => ({
+            color: v.color,
+            size: v.size,
+            providerSku: v.providerSku,
+            priceDiff: Math.round(v.price * 100) - basePrice,
+          })),
+          images: (imagesByIndex[i] ?? []).filter((img) => img.url),
+        })
+
+        if (result.ok) {
+          anySucceeded = true
+          setStatuses((s) => ({ ...s, [i]: { status: "done" } }))
+        } else {
+          setStatuses((s) => ({ ...s, [i]: { status: "error", error: result.error } }))
+        }
+      } catch {
+        // Network failure or an uncaught server-side error — surface it
+        // instead of leaving the card stuck on "Creating…" forever, and
+        // keep going so one bad row doesn't block the rest of the batch.
+        setStatuses((s) => ({ ...s, [i]: { status: "error", error: "Something went wrong. Try this one again." } }))
       }
     }
 
