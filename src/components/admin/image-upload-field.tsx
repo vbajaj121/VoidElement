@@ -8,14 +8,19 @@ import { Button } from "@/components/ui/button"
 import { Caption } from "@/components/ui/typography"
 import { uploadContentImage } from "@/app/(admin)/admin/content/actions"
 
+type UploadResult = { ok: true; url: string } | { ok: false; error: string }
+
 export function ImageUploadField({
   label,
   value,
   onChange,
+  uploadAction = uploadContentImage,
 }: {
   label: string
   value: string | null
   onChange: (url: string | null) => void
+  /** Defaults to the site-content uploader; pass a different action (e.g. uploadProductImage) to store elsewhere in Cloudinary. */
+  uploadAction?: (formData: FormData) => Promise<UploadResult>
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -28,7 +33,7 @@ export function ImageUploadField({
     setUploading(true)
     const formData = new FormData()
     formData.append("file", file)
-    const result = await uploadContentImage(formData)
+    const result = await uploadAction(formData)
     setUploading(false)
 
     if (!result.ok) {

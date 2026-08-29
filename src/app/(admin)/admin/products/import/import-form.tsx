@@ -4,14 +4,21 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useFieldArray, useForm, type Control } from "react-hook-form"
 import { toast } from "sonner"
-import { Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { GlassPanel } from "@/components/ui/glass-panel"
 import { Caption, Subheading, Body } from "@/components/ui/typography"
+import { ImageUploadField } from "@/components/admin/image-upload-field"
 import { parseVendorTable, slugify, type ParsedProductGroup } from "@/lib/product-import-parser"
 import { createProductFromImport } from "./actions"
+import { uploadProductImage } from "../../actions"
+
+interface EditableImage {
+  url: string
+  alt: string
+}
 
 interface EditableVariant {
   color: string
@@ -52,6 +59,9 @@ export function ImportForm() {
   const [warnings, setWarnings] = useState<string[]>([])
   const [parsed, setParsed] = useState(false)
   const [statuses, setStatuses] = useState<Record<number, { status: ProductStatus; error?: string }>>({})
+  // Images live outside react-hook-form, keyed by product index — same
+  // pattern as product-form.tsx (uploads happen immediately on file select).
+  const [imagesByIndex, setImagesByIndex] = useState<Record<number, EditableImage[]>>({})
 
   const { control, register, handleSubmit, reset } = useForm<FormValues>({ defaultValues: { products: [] } })
   const { fields, remove } = useFieldArray({ control, name: "products" })
@@ -65,6 +75,7 @@ export function ImportForm() {
     reset({ products: result.products.map(toEditableProduct) })
     setWarnings(result.warnings)
     setStatuses({})
+    setImagesByIndex({})
     setParsed(true)
   }
 
@@ -90,6 +101,7 @@ export function ImportForm() {
           providerSku: v.providerSku,
           priceDiff: Math.round(v.price * 100) - basePrice,
         })),
+        images: (imagesByIndex[i] ?? []).filter((img) => img.url),
       })
 
       if (result.ok) {
@@ -146,6 +158,10 @@ export function ImportForm() {
               index={index}
               status={statuses[index]}
               onRemove={() => remove(index)}
+              images={imagesByIndex[index] ?? []}
+              onImagesChange={(update) =>
+                setImagesByIndex((prev) => ({ ...prev, [index]: update(prev[index] ?? []) }))
+              }
             />
           ))}
 
@@ -177,12 +193,16 @@ function ImportProductCard({
   index,
   status,
   onRemove,
+  images,
+  onImagesChange,
 }: {
   control: Control<FormValues>
   register: ReturnType<typeof useForm<FormValues>>["register"]
   index: number
   status?: { status: ProductStatus; error?: string }
   onRemove: () => void
+  images: EditableImage[]
+  onImagesChange: (update: (prev: EditableImage[]) => EditableImage[]) => void
 }) {
   const { fields: variantFields, remove: removeVariant } = useFieldArray({
     control,
@@ -235,6 +255,61 @@ function ImportProductCard({
           {...register(`products.${index}.description`)}
         />
       </label>
+
+      <div>
+        <div className="flex items-center justify-between">
+          <Subheading className="text-lg">Images</Subheading>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            data-cursor="hover"
+            onClick={() => onImagesChange((prev) => [...prev, { url: "", alt: "" }])}
+          >
+            <Plus className="size-3.5" /> Add image
+          </Button>
+        </div>
+        <Caption className="mt-1 block">First image is used as the primary product photo. Order matters.</Caption>
+
+        <div className="mt-3 space-y-3">
+          {images.map((img, imgIndex) => (
+            <GlassPanel key={imgIndex} className="flex items-start justify-between gap-4 p-4">
+              <ImageUploadField
+                label={`Image ${imgIndex + 1}`}
+                value={img.url || null}
+                onChange={(url) =>
+                  onImagesChange((prev) => prev.map((v, i) => (i === imgIndex ? { ...v, url: url ?? "" } : v)))
+                }
+                uploadAction={uploadProductImage}
+              />
+              <div className="flex flex-1 items-end gap-2">
+                <label className="block flex-1">
+                  <Caption>Alt text (optional)</Caption>
+                  <Input
+                    className="mt-1"
+                    value={img.alt}
+                    onChange={(e) =>
+                      onImagesChange((prev) => prev.map((v, i) => (i === imgIndex ? { ...v, alt: e.target.value } : v)))
+                    }
+                  />
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  data-cursor="hover"
+                  onClick={() => onImagesChange((prev) => prev.filter((_, i) => i !== imgIndex))}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            </GlassPanel>
+          ))}
+          {images.length === 0 && (
+            <Caption className="block">No images yet — the storefront falls back to the gradient swatch until you add one.</Caption>
+          )}
+        </div>
+      </div>
 
       <div>
         <Subheading className="text-lg">Variants ({variantFields.length})</Subheading>

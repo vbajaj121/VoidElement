@@ -9,6 +9,7 @@ import { fulfillPaidOrder } from '@/lib/orders/fulfill-paid-order'
 import { logger } from '@/lib/logger'
 import { productInputSchema, orderStatusSchema, type ProductInput } from '@/lib/validation/product'
 import { isForeignKeyViolation, isUniqueConstraintViolation } from '@/lib/prisma-errors'
+import { isCloudinaryConfigured, uploadImageBuffer } from '@/lib/cloudinary'
 import type { FulfillmentProviderName } from '@/lib/fulfillment'
 
 export type ActionResult = { ok: true } | { ok: false; error: string }
@@ -98,6 +99,11 @@ export async function saveProduct(productId: string | null, rawInput: ProductInp
     isPublished: input.isPublished,
   }
 
+  // Images have no other rows pointing at them (unlike variants, which
+  // OrderItem references), so delete-and-recreate on every save is safe and
+  // far simpler than diffing which slots changed.
+  const imageData = input.images.map((img, position) => ({ url: img.url, alt: img.alt || null, position }))
+
   try {
     if (productId) {
       await prisma.$transaction([
@@ -132,6 +138,8 @@ export async function saveProduct(productId: string | null, rawInput: ProductInp
                 },
               })
         ),
+        prisma.productImage.deleteMany({ where: { productId } }),
+        ...imageData.map((img) => prisma.productImage.create({ data: { productId, ...img } })),
       ])
     } else {
       await prisma.product.create({
@@ -152,6 +160,7 @@ export async function saveProduct(productId: string | null, rawInput: ProductInp
               }
             }),
           },
+          images: { create: imageData },
         },
       })
     }
@@ -187,4 +196,34 @@ export async function deleteProduct(productId: string): Promise<ActionResult> {
   updateTag('products')
   revalidatePath('/admin/products')
   return { ok: true }
+}
+
+export type UploadImageResult = { ok: true; url: string } | { ok: false; error: string }
+
+export async function uploadProductImage(formData: FormData): Promise<UploadImageResult> {
+  await requireAdmin()
+
+  if (!isCloudinaryConfigured()) {
+    return { ok: false, error: 'Image uploads are not configured yet. Add Cloudinary credentials to enable this.' }
+  }
+
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: 'No file was selected.' }
+  }
+  if (!file.type.startsWith('image/')) {
+    return { ok: false, error: 'Only image files are supported.' }
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    return { ok: false, error: 'Image must be under 10MB.' }
+  }
+
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const url = await uploadImageBuffer(buffer, 'products')
+    return { ok: true, url }
+  } catch (err) {
+    logger.error('admin.upload_product_image_failed', { err: String(err) })
+    return { ok: false, error: 'Upload failed. Try again.' }
+  }
 }

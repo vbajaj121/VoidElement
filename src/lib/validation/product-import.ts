@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { productImageInputSchema } from "./product"
 
 export const importVariantSchema = z.object({
   color: z.string().min(1, "Color is required"),
@@ -16,6 +17,7 @@ export const importProductSchema = z.object({
   currency: z.string().default("INR"),
   isLimited: z.boolean().default(false),
   variants: z.array(importVariantSchema).min(1, "Add at least one variant"),
+  images: z.array(productImageInputSchema).default([]),
 })
 
 export type ImportVariantInput = z.infer<typeof importVariantSchema>

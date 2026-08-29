@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { RotateCw } from "lucide-react"
 import { ProductArt } from "@/components/commerce/product-art"
 import { Caption } from "@/components/ui/typography"
-import type { ProductVariant } from "@/lib/data/products"
+import { cn } from "@/lib/utils"
+import type { ProductImage, ProductVariant } from "@/lib/data/products"
 
 interface GalleryProps {
   artRef: React.RefObject<HTMLDivElement | null>
@@ -12,11 +14,14 @@ interface GalleryProps {
   face: "front" | "back"
   onFaceChange: (face: "front" | "back") => void
   isLimited?: boolean
+  /** Real uploaded photos for the product. When present, these replace the gradient placeholder. */
+  images?: ProductImage[]
 }
 
-export function Gallery({ artRef, variant, face, onFaceChange, isLimited }: GalleryProps) {
+export function Gallery({ artRef, variant, face, onFaceChange, isLimited, images = [] }: GalleryProps) {
   const [zoom, setZoom] = useState(false)
   const [origin, setOrigin] = useState("50% 50%")
+  const [activeImage, setActiveImage] = useState(0)
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -25,8 +30,10 @@ export function Gallery({ artRef, variant, face, onFaceChange, isLimited }: Gall
     setOrigin(`${x}% ${y}%`)
   }
 
+  const hasRealPhotos = images.length > 0
+
   // Placeholder "back" view: same swatch, reversed gradient direction —
-  // stands in until real front/back photography exists.
+  // stands in until real product photography exists for a variant.
   const displayColors: readonly [string, string] =
     face === "back" ? [variant.colors[1], variant.colors[0]] : variant.colors
 
@@ -45,7 +52,18 @@ export function Gallery({ artRef, variant, face, onFaceChange, isLimited }: Gall
           className="h-full w-full transition-transform duration-300 ease-out"
           style={{ transformOrigin: origin, transform: zoom ? "scale(1.5)" : "scale(1)" }}
         >
-          <ProductArt colors={displayColors} className="h-full w-full" />
+          {hasRealPhotos ? (
+            <Image
+              src={images[activeImage].url}
+              alt={images[activeImage].alt}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              priority
+              className="object-cover"
+            />
+          ) : (
+            <ProductArt colors={displayColors} className="h-full w-full" />
+          )}
         </div>
 
         {isLimited && (
@@ -54,20 +72,42 @@ export function Gallery({ artRef, variant, face, onFaceChange, isLimited }: Gall
           </span>
         )}
 
-        <button
-          type="button"
-          data-cursor="hover"
-          onClick={() => onFaceChange(face === "front" ? "back" : "front")}
-          className="glass text-soft-white absolute right-4 bottom-4 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium"
-        >
-          <RotateCw className="size-3.5" strokeWidth={1.5} />
-          {face === "front" ? "View Back" : "View Front"}
-        </button>
+        {!hasRealPhotos && (
+          <button
+            type="button"
+            data-cursor="hover"
+            onClick={() => onFaceChange(face === "front" ? "back" : "front")}
+            className="glass text-soft-white absolute right-4 bottom-4 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium"
+          >
+            <RotateCw className="size-3.5" strokeWidth={1.5} />
+            {face === "front" ? "View Back" : "View Front"}
+          </button>
+        )}
       </div>
 
-      <Caption className="mt-3 block text-center">
-        Hover to zoom · {face === "front" ? "Front" : "Back"} view
-      </Caption>
+      {hasRealPhotos && images.length > 1 ? (
+        <div className="mt-3 flex justify-center gap-2">
+          {images.map((img, index) => (
+            <button
+              key={img.url}
+              type="button"
+              data-cursor="hover"
+              onClick={() => setActiveImage(index)}
+              aria-label={`Show photo ${index + 1}`}
+              className={cn(
+                "border-border relative size-14 overflow-hidden rounded-lg border transition-opacity",
+                index === activeImage ? "opacity-100" : "opacity-50 hover:opacity-80"
+              )}
+            >
+              <Image src={img.url} alt={img.alt} fill sizes="56px" className="object-cover" />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <Caption className="mt-3 block text-center">
+          {hasRealPhotos ? "Hover to zoom" : `Hover to zoom · ${face === "front" ? "Front" : "Back"} view`}
+        </Caption>
+      )}
     </div>
   )
 }

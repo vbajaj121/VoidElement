@@ -11,6 +11,11 @@ export interface ProductVariant {
   providerSku?: string
 }
 
+export interface ProductImage {
+  url: string
+  alt: string
+}
+
 export interface MockProduct {
   slug: string
   title: string
@@ -24,6 +29,8 @@ export interface MockProduct {
   isLimited?: boolean
   /** `${color}__${size}` -> real ProductVariant id. Populated by products.server.ts only. */
   variantIds?: Record<string, string>
+  /** Real uploaded photos, ordered. Empty until an admin uploads any — components fall back to the ProductArt gradient. */
+  images?: ProductImage[]
 }
 
 export function variantKey(color: string, size: string) {

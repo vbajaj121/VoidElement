@@ -19,6 +19,7 @@ export function ProductPageClient({ product }: { product: MockProduct }) {
         face={face}
         onFaceChange={setFace}
         isLimited={product.isLimited}
+        images={product.images}
       />
       <PurchasePanel
         product={product}

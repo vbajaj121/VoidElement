@@ -39,6 +39,9 @@ export async function createProductFromImport(input: ImportProductInput): Promis
       // Imported products start unpublished so they can be reviewed (real
       // description, category, pricing) before going live on the storefront.
       isPublished: false,
+      images: {
+        create: data.images.map((img, position) => ({ url: img.url, alt: img.alt || null, position })),
+      },
     },
   })
 

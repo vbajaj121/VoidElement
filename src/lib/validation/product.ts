@@ -10,6 +10,11 @@ export const productVariantInputSchema = z.object({
   stock: z.number().int().min(0, "Stock can't be negative"),
 })
 
+export const productImageInputSchema = z.object({
+  url: z.string().min(1, "Image is required"),
+  alt: z.string().optional(),
+})
+
 export const productInputSchema = z.object({
   slug: z
     .string()
@@ -25,9 +30,11 @@ export const productInputSchema = z.object({
   isLimited: z.boolean(),
   isPublished: z.boolean(),
   variants: z.array(productVariantInputSchema).min(1, "Add at least one variant"),
+  images: z.array(productImageInputSchema).default([]),
 })
 
 export const orderStatusSchema = z.nativeEnum(OrderStatus)
 
 export type ProductVariantInput = z.infer<typeof productVariantInputSchema>
+export type ProductImageInput = z.infer<typeof productImageInputSchema>
 export type ProductInput = z.infer<typeof productInputSchema>

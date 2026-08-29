@@ -12,7 +12,10 @@ interface EditProductPageProps {
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = await params
-  const product = await prisma.product.findUnique({ where: { id }, include: { variants: true } })
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { variants: true, images: { orderBy: { position: 'asc' } } },
+  })
   if (!product) notFound()
 
   const colors = product.colors as unknown as [string, string]
@@ -43,6 +46,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
               stock: v.stock,
             })),
           }}
+          defaultImages={product.images.map((img) => ({ url: img.url, alt: img.alt ?? "" }))}
         />
       </div>
     </div>

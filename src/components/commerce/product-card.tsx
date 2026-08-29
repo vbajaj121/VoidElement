@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { m } from "framer-motion"
 import { Plus } from "lucide-react"
@@ -46,10 +47,20 @@ export function ProductCard({ product }: { product: MockProduct }) {
         className="block"
       >
         <div className="relative aspect-4/5 overflow-hidden rounded-2xl">
-          <ProductArt
-            colors={product.colors}
-            className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-105"
-          />
+          {product.images?.[0] ? (
+            <Image
+              src={product.images[0].url}
+              alt={product.images[0].alt}
+              fill
+              sizes="(min-width: 1024px) 25vw, 50vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <ProductArt
+              colors={product.colors}
+              className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          )}
           {product.isLimited && (
             <Badge className="absolute top-3 left-3" variant="secondary">
               Limited

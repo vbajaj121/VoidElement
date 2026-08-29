@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Caption, Subheading } from "@/components/ui/typography"
-import { saveProduct, deleteProduct } from "../actions"
+import { GlassPanel } from "@/components/ui/glass-panel"
+import { ImageUploadField } from "@/components/admin/image-upload-field"
+import { saveProduct, deleteProduct, uploadProductImage } from "../actions"
 
 interface VariantFormValues {
   id?: string
@@ -18,6 +20,11 @@ interface VariantFormValues {
   size: string
   priceDiff: number
   stock: number
+}
+
+interface ImageFormValues {
+  url: string
+  alt: string
 }
 
 interface ProductFormValues {
@@ -37,14 +44,21 @@ interface ProductFormValues {
 export function ProductForm({
   productId,
   defaultValues,
+  defaultImages = [],
 }: {
   productId: string | null
   defaultValues: ProductFormValues
+  defaultImages?: ImageFormValues[]
 }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const { register, control, handleSubmit } = useForm<ProductFormValues>({ defaultValues })
   const { fields, append, remove } = useFieldArray({ control, name: "variants" })
+
+  // Images live in local state rather than react-hook-form (same pattern as
+  // the site-content CMS forms) — uploads happen immediately on file select,
+  // independent of the form's own submit cycle.
+  const [images, setImages] = useState<ImageFormValues[]>(defaultImages)
 
   async function onSubmit(values: ProductFormValues) {
     setSubmitting(true)
@@ -56,6 +70,7 @@ export function ProductForm({
         priceDiff: Number(v.priceDiff),
         stock: Number(v.stock),
       })),
+      images: images.filter((img) => img.url),
     })
     setSubmitting(false)
 
@@ -122,6 +137,61 @@ export function ProductForm({
           <input type="checkbox" {...register("isPublished")} />
           <Caption>Published</Caption>
         </label>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between">
+          <Subheading className="text-lg">Images</Subheading>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            data-cursor="hover"
+            onClick={() => setImages((prev) => [...prev, { url: "", alt: "" }])}
+          >
+            <Plus className="size-3.5" /> Add image
+          </Button>
+        </div>
+        <Caption className="mt-1 block">First image is used as the primary product photo. Order matters.</Caption>
+
+        <div className="mt-4 space-y-3">
+          {images.map((img, index) => (
+            <GlassPanel key={index} className="flex items-start justify-between gap-4 p-4">
+              <ImageUploadField
+                label={`Image ${index + 1}`}
+                value={img.url || null}
+                onChange={(url) =>
+                  setImages((prev) => prev.map((v, i) => (i === index ? { ...v, url: url ?? "" } : v)))
+                }
+                uploadAction={uploadProductImage}
+              />
+              <div className="flex flex-1 items-end gap-2">
+                <label className="block flex-1">
+                  <Caption>Alt text (optional)</Caption>
+                  <Input
+                    className="mt-1"
+                    value={img.alt}
+                    onChange={(e) =>
+                      setImages((prev) => prev.map((v, i) => (i === index ? { ...v, alt: e.target.value } : v)))
+                    }
+                  />
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  data-cursor="hover"
+                  onClick={() => setImages((prev) => prev.filter((_, i) => i !== index))}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            </GlassPanel>
+          ))}
+          {images.length === 0 && (
+            <Caption className="block">No images yet — the storefront falls back to the gradient swatch above.</Caption>
+          )}
+        </div>
       </div>
 
       <div>

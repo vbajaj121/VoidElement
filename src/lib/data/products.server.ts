@@ -39,13 +39,14 @@ function toMockProduct(product: NonNullable<DbProductWithVariants>): MockProduct
     variants: colorVariants,
     isLimited: product.isLimited,
     variantIds,
+    images: product.images.map((img) => ({ url: img.url, alt: img.alt ?? product.title })),
   }
 }
 
 async function fetchProducts() {
   return prisma.product.findMany({
     where: { isPublished: true },
-    include: { variants: true },
+    include: { variants: true, images: { orderBy: { position: 'asc' } } },
     orderBy: { createdAt: 'asc' },
   })
 }
@@ -53,7 +54,7 @@ async function fetchProducts() {
 async function fetchProductBySlug(slug: string) {
   return prisma.product.findUnique({
     where: { slug, isPublished: true },
-    include: { variants: true },
+    include: { variants: true, images: { orderBy: { position: 'asc' } } },
   })
 }
 
