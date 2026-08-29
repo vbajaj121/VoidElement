@@ -5,11 +5,14 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/stagger-group"
 import { ProductArt } from "@/components/commerce/product-art"
 import { Button } from "@/components/ui/button"
 import { Eyebrow, Heading, Body, Subheading } from "@/components/ui/typography"
-import { collections } from "@/lib/data/collections"
+import { getCollections } from "@/lib/data/collections"
 import { getSiteContent } from "@/lib/data/site-content.server"
 
 export async function ExploreCollections() {
-  const content = await getSiteContent("explore-collections")
+  const [content, collections] = await Promise.all([
+    getSiteContent("explore-collections"),
+    getCollections(),
+  ])
 
   return (
     <Section id="explore-collections">
