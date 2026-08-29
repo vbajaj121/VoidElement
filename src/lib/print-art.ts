@@ -1,4 +1,3 @@
-import sharp from 'sharp'
 import { isCloudinaryConfigured, uploadImageBuffer } from './cloudinary'
 
 /**
@@ -8,13 +7,17 @@ import { isCloudinaryConfigured, uploadImageBuffer } from './cloudinary'
  * name and color as the "design". One file per color (not per size, since
  * size doesn't change the artwork).
  *
- * Uploaded to Cloudinary rather than written to local disk — Vercel's
- * serverless functions run on a read-only filesystem, so a local
- * `public/print-files` write (the original approach) throws there. A
- * deterministic `public_id` + `overwrite: false` means re-runs (seed
- * re-runs, re-importing the same color) reuse the existing asset instead of
- * re-uploading. Shared by prisma/seed.ts and the admin vendor-table import
- * action.
+ * The SVG is uploaded to Cloudinary as-is and converted to PNG there
+ * (`format: 'png'`) rather than rasterized locally with `sharp` — a native
+ * binary that failed to load on Vercel's Linux runtime (npm's allow-scripts
+ * policy skips sharp's own postinstall there, which is what fetches the
+ * matching prebuilt binary; see the sibling fix to package.json). Cloudinary
+ * already does this exact conversion for every other image in the app, so
+ * this removes a native-binary platform dependency entirely rather than
+ * chasing that install script. A deterministic `public_id` + `overwrite:
+ * false` means re-runs (seed re-runs, re-importing the same color) reuse
+ * the existing asset instead of re-uploading. Shared by prisma/seed.ts and
+ * the admin vendor-table import action.
  */
 export async function ensurePrintArt(
   productTitle: string,
@@ -22,19 +25,17 @@ export async function ensurePrintArt(
   [from, to]: readonly [string, string]
 ): Promise<string> {
   const slug = `${productTitle}-${color}`.toLowerCase().replace(/[^a-z0-9-]+/g, '-')
+  const svg = printArtSvg(productTitle, color, from, to)
+  const buffer = Buffer.from(svg)
 
   if (!isCloudinaryConfigured()) {
     // No Cloudinary credentials configured (e.g. local dev without .env
-    // secrets) — fall back to a data URI so callers still get something
-    // usable instead of throwing.
-    const svg = printArtSvg(productTitle, color, from, to)
-    const buffer = await sharp(Buffer.from(svg)).png().toBuffer()
-    return `data:image/png;base64,${buffer.toString('base64')}`
+    // secrets) — fall back to an inline SVG data URI so callers still get
+    // something usable instead of throwing.
+    return `data:image/svg+xml;base64,${buffer.toString('base64')}`
   }
 
-  const svg = printArtSvg(productTitle, color, from, to)
-  const buffer = await sharp(Buffer.from(svg)).png().toBuffer()
-  return uploadImageBuffer(buffer, 'print-files', { publicId: slug, overwrite: false })
+  return uploadImageBuffer(buffer, 'print-files', { publicId: slug, overwrite: false, format: 'png' })
 }
 
 function printArtSvg(productTitle: string, color: string, from: string, to: string): string {

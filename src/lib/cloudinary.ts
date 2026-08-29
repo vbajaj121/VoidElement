@@ -16,11 +16,16 @@ cloudinary.config({
 export async function uploadImageBuffer(
   buffer: Buffer,
   folder: string,
-  options?: { publicId?: string; overwrite?: boolean }
+  options?: { publicId?: string; overwrite?: boolean; format?: string }
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder, public_id: options?.publicId, overwrite: options?.overwrite ?? true },
+      {
+        folder,
+        public_id: options?.publicId,
+        overwrite: options?.overwrite ?? true,
+        format: options?.format,
+      },
       (error, result) => {
         if (error || !result) return reject(error ?? new Error('Cloudinary upload returned no result.'))
         resolve(result.secure_url)
