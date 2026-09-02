@@ -24,13 +24,14 @@ export function HeroClient({ content }: { content: HeroContent }) {
   }, [])
 
   return (
-    <section className="relative w-full overflow-hidden pt-24 pb-16">
+    <section className="relative w-full overflow-hidden pt-24 pb-0 lg:pb-16">
       {finePointer && <AuroraBackground className="top-0 left-1/2 -translate-x-1/2 opacity-[0.12]" />}
 
       <Container className="relative">
         <HeroVisual bannerImageUrl={content.bannerImageUrl} />
 
-        <div className="mt-10 flex flex-col items-center text-center lg:mx-auto lg:max-w-2xl">
+        {/* Mobile: just the banner image above — no headline/copy/buttons below it. */}
+        <div className="mt-10 hidden flex-col items-center text-center lg:flex lg:mx-auto lg:max-w-2xl">
           <Eyebrow as="p" className="mb-6">
             {content.eyebrow}
           </Eyebrow>
