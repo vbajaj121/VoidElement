@@ -7,6 +7,7 @@ import { SITE_CONTENT_SECTIONS, type SiteContentSection } from "@/lib/validation
 export const metadata: Metadata = { title: "Content · Admin" }
 
 const HOMEPAGE_SECTIONS: { key: SiteContentSection; blurb: string }[] = [
+  { key: "drop-intro", blurb: "The falling-box, click-to-open reveal above The Drop's product grid." },
   { key: "hero", blurb: "Banner image, headline, and the two hero buttons." },
   { key: "product-showcase", blurb: "Heading above the featured product grid." },
   { key: "limited-edition", blurb: "The single-product spotlight callout." },
