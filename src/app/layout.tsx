@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { CustomCursorLoader } from "@/components/motion/custom-cursor-loader";
 import { LazyMotionProvider } from "@/components/motion/lazy-motion-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SITE_URL } from "@/lib/site";
@@ -76,7 +75,6 @@ export default function RootLayout({
         <ThemeProvider>
           <LazyMotionProvider>
             <TooltipProvider delay={150}>{children}</TooltipProvider>
-            <CustomCursorLoader />
           </LazyMotionProvider>
           <Toaster />
         </ThemeProvider>
