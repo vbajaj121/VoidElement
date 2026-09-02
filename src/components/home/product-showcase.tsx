@@ -10,7 +10,7 @@ export async function ProductShowcase() {
   const [products, content] = await Promise.all([getProducts(), getSiteContent("product-showcase")])
 
   return (
-    <Section>
+    <Section id="the-drop">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
