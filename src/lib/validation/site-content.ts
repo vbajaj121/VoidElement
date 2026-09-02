@@ -148,6 +148,21 @@ const trustBarDefault: TrustBarContent = {
   ],
 }
 
+// ---- marquee ----
+export const marqueeContentSchema = z.object({
+  messages: z.array(z.string().min(1)).min(1, "Add at least one message"),
+})
+export type MarqueeContent = z.infer<typeof marqueeContentSchema>
+const marqueeDefault: MarqueeContent = {
+  messages: [
+    "Cut in small batches — once sold out, gone for good",
+    "14-day easy returns",
+    "Secure checkout — encrypted payments",
+    "Ships in 5–7 business days",
+    "Limited runs only",
+  ],
+}
+
 // ---- newsletter ----
 export const newsletterContentSchema = z.object({
   eyebrow: z.string().min(1),
@@ -392,6 +407,7 @@ export const SITE_CONTENT_SECTIONS = {
     default: limitedEditionDefault,
   },
   "trust-bar": { label: "Trust Bar", schema: trustBarContentSchema, default: trustBarDefault },
+  marquee: { label: "Scrolling Banner", schema: marqueeContentSchema, default: marqueeDefault },
   newsletter: { label: "Newsletter", schema: newsletterContentSchema, default: newsletterDefault },
   footer: { label: "Footer", schema: footerContentSchema, default: footerDefault },
   "page-about": { label: "About Page", schema: pageContentSchema, default: pageAboutDefault },

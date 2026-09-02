@@ -13,6 +13,7 @@ const HOMEPAGE_SECTIONS: { key: SiteContentSection; blurb: string }[] = [
   { key: "process", blurb: "The five-step \"how it's made\" section." },
   { key: "newsletter", blurb: "Email signup copy." },
   { key: "trust-bar", blurb: "The four icon+text badges." },
+  { key: "marquee", blurb: "The scrolling ticker strip below the hero." },
   { key: "footer", blurb: "Footer columns, links, and social URLs." },
 ]
 
@@ -30,7 +31,7 @@ const STATIC_PAGES: { key: SiteContentSection; blurb: string }[] = [
 function SectionCard({ section, blurb }: { section: SiteContentSection; blurb: string }) {
   return (
     <Link href={`/admin/content/${section}`} data-cursor="hover">
-      <GlassPanel className="h-full p-5 transition-colors hover:bg-white/5">
+      <GlassPanel className="h-full p-5 transition-colors hover:bg-foreground/5">
         <Body className="text-soft-white font-medium">{SITE_CONTENT_SECTIONS[section].label}</Body>
         <Caption className="mt-1 block">{blurb}</Caption>
       </GlassPanel>

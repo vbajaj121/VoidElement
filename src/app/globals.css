@@ -229,6 +229,10 @@
   .animate-aurora {
     animation: aurora-spin 40s linear infinite;
   }
+
+  .animate-marquee {
+    animation: marquee-scroll 28s linear infinite;
+  }
 }
 
 .cursor-none,
@@ -246,5 +250,13 @@
 @keyframes aurora-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee-scroll {
+  to {
+    /* The track renders its message list twice back-to-back — sliding
+       exactly half its width loops seamlessly into the duplicate copy. */
+    transform: translateX(-50%);
   }
 }
