@@ -50,6 +50,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -83,13 +85,69 @@
 }
 
 /*
-  VOID / luxury palette. The platform is permanently dark — there is no
-  light-mode toggle, so :root and .dark share the same values. Keeping both
-  populated means any shadcn/Base UI primitive that keys off .dark still
-  resolves to the correct tokens.
+  VOID / luxury palette, now split for a real light/dark toggle (see
+  ThemeProvider + ThemeToggle). :root holds the light values, .dark
+  overrides them — same shape next-themes/shadcn expect.
+
+  --ink and --paper are FIXED, non-flipping: a few spots (text sitting on
+  the accent-champagne gold, which stays the same warm gold in both themes)
+  need to stay dark or light regardless of the active theme rather than
+  tracking --soft-white/--matte-black, which do flip. See globals usage of
+  `text-ink` in button.tsx/navbar.tsx/custom-cursor.tsx/checkout-success.tsx.
 */
-:root,
+:root {
+  --ink: oklch(0.09 0 0);
+  --paper: oklch(0.98 0.005 95);
+}
+
+:root {
+  /* Light theme */
+  --matte-black: oklch(0.98 0.005 95);
+  --carbon: oklch(0.95 0.004 90);
+  --titanium: oklch(0.32 0.006 260);
+  --soft-white: oklch(0.14 0.004 90);
+  --warm-grey: oklch(0.45 0.012 55);
+  --accent-champagne: oklch(0.66 0.1 78);
+  --aurora-a: oklch(0.72 0.09 250);
+  --aurora-b: oklch(0.72 0.1 320);
+  --aurora-c: oklch(0.74 0.09 160);
+
+  --background: var(--matte-black);
+  --foreground: var(--soft-white);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--soft-white);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--soft-white);
+  --primary: var(--accent-champagne);
+  --primary-foreground: var(--ink);
+  --secondary: var(--carbon);
+  --secondary-foreground: var(--soft-white);
+  --muted: oklch(0.95 0.004 90);
+  --muted-foreground: var(--warm-grey);
+  --accent: var(--titanium);
+  --accent-foreground: var(--paper);
+  --destructive: oklch(0.55 0.19 25);
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 12%);
+  --ring: oklch(0.66 0.1 78 / 50%);
+  --chart-1: var(--aurora-a);
+  --chart-2: var(--aurora-b);
+  --chart-3: var(--aurora-c);
+  --chart-4: var(--titanium);
+  --chart-5: var(--warm-grey);
+  --radius: 0.5rem;
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: var(--soft-white);
+  --sidebar-primary: var(--accent-champagne);
+  --sidebar-primary-foreground: var(--ink);
+  --sidebar-accent: var(--titanium);
+  --sidebar-accent-foreground: var(--paper);
+  --sidebar-border: oklch(0 0 0 / 10%);
+  --sidebar-ring: oklch(0.66 0.1 78 / 50%);
+}
+
 .dark {
+  /* Dark theme — the original, unchanged values */
   --matte-black: oklch(0.09 0 0);
   --carbon: oklch(0.15 0.002 260);
   --titanium: oklch(0.75 0.004 260);
@@ -107,13 +165,13 @@
   --popover: var(--carbon);
   --popover-foreground: var(--soft-white);
   --primary: var(--accent-champagne);
-  --primary-foreground: var(--matte-black);
+  --primary-foreground: var(--ink);
   --secondary: var(--carbon);
   --secondary-foreground: var(--soft-white);
   --muted: oklch(0.18 0.002 260);
   --muted-foreground: var(--warm-grey);
   --accent: var(--titanium);
-  --accent-foreground: var(--matte-black);
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.62 0.2 25);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
@@ -127,9 +185,9 @@
   --sidebar: var(--carbon);
   --sidebar-foreground: var(--soft-white);
   --sidebar-primary: var(--accent-champagne);
-  --sidebar-primary-foreground: var(--matte-black);
+  --sidebar-primary-foreground: var(--ink);
   --sidebar-accent: var(--titanium);
-  --sidebar-accent-foreground: var(--matte-black);
+  --sidebar-accent-foreground: var(--ink);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.78 0.06 85 / 50%);
 }
@@ -151,7 +209,7 @@
     background: color-mix(in oklch, var(--carbon) 55%, transparent);
     backdrop-filter: blur(24px) saturate(140%);
     -webkit-backdrop-filter: blur(24px) saturate(140%);
-    border: 1px solid oklch(1 0 0 / 8%);
+    border: 1px solid var(--border);
   }
 
   .bg-aurora {

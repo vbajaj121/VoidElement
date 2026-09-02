@@ -29,12 +29,23 @@ export interface MockProduct {
   isLimited?: boolean
   /** `${color}__${size}` -> real ProductVariant id. Populated by products.server.ts only. */
   variantIds?: Record<string, string>
+  /** `${color}__${size}` -> real stock count. Populated by products.server.ts only — drives the low-stock hint on the product page. */
+  stockByVariantKey?: Record<string, number>
   /** Real uploaded photos, ordered. Empty until an admin uploads any — components fall back to the ProductArt gradient. */
   images?: ProductImage[]
 }
 
 export function variantKey(color: string, size: string) {
   return `${color}__${size}`
+}
+
+/** Shared low-stock threshold — the same number drives both the product-page hint and the grid-card badge, so they never disagree. */
+export const LOW_STOCK_THRESHOLD = 10
+
+/** Total remaining stock across every color/size combo, for a grid-level "almost gone" badge. Undefined when stock data hasn't been populated (e.g. an uninitialized MockProduct). */
+export function getTotalStock(product: MockProduct): number | undefined {
+  if (!product.stockByVariantKey) return undefined
+  return Object.values(product.stockByVariantKey).reduce((sum, n) => sum + n, 0)
 }
 
 /** First color + first size, for quick-add flows that don't ask the shopper to pick. */

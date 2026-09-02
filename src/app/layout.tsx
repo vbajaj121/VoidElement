@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { CustomCursorLoader } from "@/components/motion/custom-cursor-loader";
 import { LazyMotionProvider } from "@/components/motion/lazy-motion-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -68,14 +69,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <LazyMotionProvider>
-          <TooltipProvider delay={150}>{children}</TooltipProvider>
-          <CustomCursorLoader />
-        </LazyMotionProvider>
-        <Toaster theme="dark" />
+        <ThemeProvider>
+          <LazyMotionProvider>
+            <TooltipProvider delay={150}>{children}</TooltipProvider>
+            <CustomCursorLoader />
+          </LazyMotionProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -113,7 +113,7 @@ export function ProcessCarousel({ steps }: { steps: ProcessContent["steps"] }) {
                 <span
                   className={cn(
                     "block h-px w-8 rounded-full transition-all duration-300",
-                    i === activeIndex ? "bg-accent-champagne w-10" : "bg-white/15 group-hover:bg-white/30"
+                    i === activeIndex ? "bg-accent-champagne w-10" : "bg-foreground/15 group-hover:bg-foreground/30"
                   )}
                 />
               </button>

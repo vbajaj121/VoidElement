@@ -21,7 +21,7 @@ const buttonVariants = cva(
         luxury:
           "rounded-full border-soft-white/25 bg-transparent text-soft-white uppercase tracking-[0.15em] hover:border-soft-white/60 hover:bg-soft-white/5",
         "luxury-filled":
-          "rounded-full bg-accent-champagne text-matte-black uppercase tracking-[0.15em] hover:bg-accent-champagne/85",
+          "rounded-full bg-accent-champagne text-ink uppercase tracking-[0.15em] hover:bg-accent-champagne/85",
       },
       size: {
         default:

@@ -19,7 +19,7 @@ export function CheckoutSuccess({ orderNumber, email }: { orderNumber: string; e
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.15 }}
-        className="bg-accent-champagne text-matte-black flex size-16 items-center justify-center rounded-full"
+        className="bg-accent-champagne text-ink flex size-16 items-center justify-center rounded-full"
       >
         <Check className="size-7" strokeWidth={2} />
       </m.div>

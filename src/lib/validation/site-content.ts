@@ -38,19 +38,6 @@ const heroDefault: HeroContent = {
   bannerImageUrl: "/hero/banner.png",
 }
 
-// ---- explore-collections ----
-export const exploreCollectionsContentSchema = z.object({
-  eyebrow: z.string().min(1),
-  heading: z.string().min(1),
-  browseAllLabel: z.string().min(1),
-})
-export type ExploreCollectionsContent = z.infer<typeof exploreCollectionsContentSchema>
-const exploreCollectionsDefault: ExploreCollectionsContent = {
-  eyebrow: "Explore Collections",
-  heading: "Shop by category.",
-  browseAllLabel: "Browse All",
-}
-
 // ---- process ----
 export const processStepSchema = z.object({
   number: z.string().min(1),
@@ -201,12 +188,7 @@ const footerDefault: FooterContent = {
   columns: [
     {
       heading: "Shop",
-      links: [
-        { label: "All Products", href: "/shop" },
-        { label: "Tees", href: "/shop?category=Tees" },
-        { label: "Hoodies", href: "/shop?category=Hoodies" },
-        { label: "Outerwear", href: "/shop?category=Outerwear" },
-      ],
+      links: [{ label: "All Products", href: "/shop" }],
     },
     {
       heading: "Company",
@@ -398,11 +380,6 @@ const pageTermsDefault: PageContent = {
  */
 export const SITE_CONTENT_SECTIONS = {
   hero: { label: "Hero & Banner", schema: heroContentSchema, default: heroDefault },
-  "explore-collections": {
-    label: "Explore Collections",
-    schema: exploreCollectionsContentSchema,
-    default: exploreCollectionsDefault,
-  },
   process: { label: "Our Process", schema: processContentSchema, default: processDefault },
   "product-showcase": {
     label: "The Drop (Product Grid)",

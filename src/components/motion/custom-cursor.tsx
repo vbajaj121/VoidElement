@@ -106,7 +106,7 @@ export function CustomCursor() {
           <img src={state.previewSrc} alt="" className="h-full w-full object-cover" />
         )}
         {state.variant === 'text' && state.label && (
-          <span className="text-matte-black px-2 text-center text-[10px] font-medium tracking-wide uppercase">
+          <span className="text-ink px-2 text-center text-[10px] font-medium tracking-wide uppercase">
             {state.label}
           </span>
         )}

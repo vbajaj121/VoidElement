@@ -15,7 +15,7 @@ import { Eyebrow, Heading, Body, Caption } from "@/components/ui/typography"
 import { formatPrice } from "@/lib/format"
 import { flyToCart } from "@/lib/motion/fly-to-cart"
 import { useCart } from "@/lib/store/cart"
-import { variantKey, type MockProduct, type ProductVariant } from "@/lib/data/products"
+import { variantKey, LOW_STOCK_THRESHOLD, type MockProduct, type ProductVariant } from "@/lib/data/products"
 import { cn } from "@/lib/utils"
 
 interface PurchasePanelProps {
@@ -31,6 +31,9 @@ export function PurchasePanel({ product, variant, onVariantChange, artRef }: Pur
   const [added, setAdded] = useState(false)
   const addItem = useCart((s) => s.addItem)
 
+  const stock = size ? product.stockByVariantKey?.[variantKey(variant.color, size)] : undefined
+  const soldOut = stock !== undefined && stock <= 0
+
   function handleAddToCart() {
     if (!size) {
       toast.error("Select a size first.")
@@ -39,6 +42,10 @@ export function PurchasePanel({ product, variant, onVariantChange, artRef }: Pur
     const variantId = product.variantIds?.[variantKey(variant.color, size)]
     if (!variantId) {
       toast.error("That combination isn't available.")
+      return
+    }
+    if (soldOut) {
+      toast.error("That size just sold out.")
       return
     }
     if (artRef.current) flyToCart(artRef.current, variant.colors)
@@ -114,6 +121,16 @@ export function PurchasePanel({ product, variant, onVariantChange, artRef }: Pur
             </button>
           ))}
         </div>
+        {stock !== undefined && stock > 0 && stock <= LOW_STOCK_THRESHOLD && (
+          <Caption className="mt-2 block text-destructive">
+            Only {stock} left in {variant.color} / {size}
+          </Caption>
+        )}
+        {soldOut && (
+          <Caption className="mt-2 block text-destructive">
+            {variant.color} / {size} just sold out
+          </Caption>
+        )}
       </div>
 
       <div className="mt-8 flex items-center gap-4">
@@ -140,11 +157,19 @@ export function PurchasePanel({ product, variant, onVariantChange, artRef }: Pur
       </div>
 
       <Magnetic className="mt-8 block w-full">
-        <Button size="xl" variant="luxury-filled" className="w-full" onClick={handleAddToCart}>
+        <Button
+          size="xl"
+          variant="luxury-filled"
+          className="w-full"
+          onClick={handleAddToCart}
+          disabled={soldOut}
+        >
           {added ? (
             <>
               <Check className="size-4" /> Added
             </>
+          ) : soldOut ? (
+            "Sold Out"
           ) : (
             "Add To Cart"
           )}

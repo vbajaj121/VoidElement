@@ -10,6 +10,7 @@ function toMockProduct(product: NonNullable<DbProductWithVariants>): MockProduct
   const sizes: string[] = []
   const seenSizes = new Set<string>()
   const variantIds: Record<string, string> = {}
+  const stockByVariantKey: Record<string, number> = {}
 
   for (const variant of product.variants) {
     if (!seenColors.has(variant.color)) {
@@ -24,7 +25,9 @@ function toMockProduct(product: NonNullable<DbProductWithVariants>): MockProduct
       seenSizes.add(variant.size)
       sizes.push(variant.size)
     }
-    variantIds[variantKey(variant.color, variant.size)] = variant.id
+    const key = variantKey(variant.color, variant.size)
+    variantIds[key] = variant.id
+    stockByVariantKey[key] = variant.stock
   }
 
   return {
@@ -39,6 +42,7 @@ function toMockProduct(product: NonNullable<DbProductWithVariants>): MockProduct
     variants: colorVariants,
     isLimited: product.isLimited,
     variantIds,
+    stockByVariantKey,
     images: product.images.map((img) => ({ url: img.url, alt: img.alt ?? product.title })),
   }
 }

@@ -6,6 +6,7 @@ import { Menu, Search, ShoppingBag, User } from "lucide-react"
 import { Magnetic } from "@/components/motion/magnetic"
 import { Logo } from "@/components/brand/logo"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useCart, cartCount } from "@/lib/store/cart"
 import { useSearchStore } from "@/lib/store/search"
@@ -56,6 +57,8 @@ export function Navbar() {
       </nav>
 
       <div className="flex items-center gap-2 text-soft-white">
+        <ThemeToggle className="hidden sm:inline-flex" />
+
         <Button
           size="icon"
           variant="ghost"
@@ -93,7 +96,7 @@ export function Navbar() {
         >
           <ShoppingBag className="size-4" strokeWidth={1.5} />
           {count > 0 && (
-            <span className="bg-accent-champagne text-matte-black absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[10px] font-semibold">
+            <span className="bg-accent-champagne text-ink absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[10px] font-semibold">
               {count}
             </span>
           )}
@@ -129,6 +132,10 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
+          <div className="border-border mt-2 flex items-center justify-between border-t px-6 py-4">
+            <span className="text-warm-grey text-xs font-medium tracking-[0.15em] uppercase">Theme</span>
+            <ThemeToggle />
+          </div>
         </SheetContent>
       </Sheet>
     </header>

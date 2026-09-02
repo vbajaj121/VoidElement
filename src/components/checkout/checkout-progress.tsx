@@ -25,7 +25,7 @@ export function CheckoutProgress({ contactDone, shippingDone, stage }: CheckoutP
       {steps.map((step, i) => (
         <div key={step.label} className="flex flex-1 items-center gap-3">
           <div className="flex flex-col gap-2">
-            <div className="border-border relative h-1 w-16 overflow-hidden rounded-full border-0 bg-white/10 sm:w-24">
+            <div className="border-border relative h-1 w-16 overflow-hidden rounded-full border-0 bg-foreground/10 sm:w-24">
               <m.div
                 className="bg-accent-champagne absolute inset-y-0 left-0"
                 initial={false}

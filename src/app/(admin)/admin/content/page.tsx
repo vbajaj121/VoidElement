@@ -8,7 +8,6 @@ export const metadata: Metadata = { title: "Content · Admin" }
 
 const HOMEPAGE_SECTIONS: { key: SiteContentSection; blurb: string }[] = [
   { key: "hero", blurb: "Banner image, headline, and the two hero buttons." },
-  { key: "explore-collections", blurb: "Heading above the category grid." },
   { key: "product-showcase", blurb: "Heading above the featured product grid." },
   { key: "limited-edition", blurb: "The single-product spotlight callout." },
   { key: "process", blurb: "The five-step \"how it's made\" section." },

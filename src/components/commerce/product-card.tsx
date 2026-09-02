@@ -10,12 +10,15 @@ import { Button } from "@/components/ui/button"
 import { Body, Caption } from "@/components/ui/typography"
 import { gradientDataUri } from "@/lib/data/gradient"
 import { formatPrice } from "@/lib/format"
-import { defaultVariantSelection, type MockProduct } from "@/lib/data/products"
+import { defaultVariantSelection, getTotalStock, LOW_STOCK_THRESHOLD, type MockProduct } from "@/lib/data/products"
 import { useCart } from "@/lib/store/cart"
 import { toast } from "sonner"
 
 export function ProductCard({ product }: { product: MockProduct }) {
   const addItem = useCart((s) => s.addItem)
+  const totalStock = getTotalStock(product)
+  const lowStock = totalStock !== undefined && totalStock > 0 && totalStock <= LOW_STOCK_THRESHOLD
+  const soldOut = totalStock !== undefined && totalStock <= 0
 
   function handleQuickAdd() {
     const { color, size, variantId } = defaultVariantSelection(product)
@@ -61,11 +64,14 @@ export function ProductCard({ product }: { product: MockProduct }) {
               className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-105"
             />
           )}
-          {product.isLimited && (
-            <Badge className="absolute top-3 left-3" variant="secondary">
-              Limited
-            </Badge>
-          )}
+          <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
+            {product.isLimited && <Badge variant="secondary">Limited</Badge>}
+            {soldOut ? (
+              <Badge variant="destructive">Sold Out</Badge>
+            ) : (
+              lowStock && <Badge variant="destructive">Only {totalStock} Left</Badge>
+            )}
+          </div>
         </div>
       </Link>
 
