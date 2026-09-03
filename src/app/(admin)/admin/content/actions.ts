@@ -9,7 +9,6 @@ import { isCloudinaryConfigured, uploadImageBuffer } from '@/lib/cloudinary'
 
 const PUBLIC_PATHS_BY_SECTION: Record<SiteContentSection, string[]> = {
   hero: ['/'],
-  'drop-intro': ['/'],
   process: ['/'],
   'product-showcase': ['/'],
   'limited-edition': ['/'],

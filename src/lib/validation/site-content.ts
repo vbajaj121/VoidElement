@@ -148,20 +148,6 @@ const trustBarDefault: TrustBarContent = {
   ],
 }
 
-// ---- drop-intro ----
-export const dropIntroContentSchema = z.object({
-  enabled: z.boolean(),
-  // Changing this re-triggers the intro for everyone once more — each
-  // visitor's browser remembers the last dropId it saw (localStorage), not
-  // a fixed "seen it" flag, so a new value here is what signals "new drop."
-  dropId: z.string().min(1),
-})
-export type DropIntroContent = z.infer<typeof dropIntroContentSchema>
-const dropIntroDefault: DropIntroContent = {
-  enabled: true,
-  dropId: "drop-002",
-}
-
 // ---- marquee ----
 export const marqueeContentSchema = z.object({
   messages: z.array(z.string().min(1)).min(1, "Add at least one message"),
@@ -422,7 +408,6 @@ export const SITE_CONTENT_SECTIONS = {
   },
   "trust-bar": { label: "Trust Bar", schema: trustBarContentSchema, default: trustBarDefault },
   marquee: { label: "Scrolling Banner", schema: marqueeContentSchema, default: marqueeDefault },
-  "drop-intro": { label: "Drop Intro Animation", schema: dropIntroContentSchema, default: dropIntroDefault },
   newsletter: { label: "Newsletter", schema: newsletterContentSchema, default: newsletterDefault },
   footer: { label: "Footer", schema: footerContentSchema, default: footerDefault },
   "page-about": { label: "About Page", schema: pageContentSchema, default: pageAboutDefault },
