@@ -24,6 +24,12 @@ export const heroContentSchema = z.object({
   secondaryButtonHref: z.string().min(1),
   scrollHint: z.string().min(1),
   bannerImageUrl: z.string().nullable(),
+  // Desktop banner is shown at 16:9, mobile at 9:16 — different crops (a
+  // wide landscape shot doesn't just re-crop into a good portrait one), so
+  // this is a separate upload rather than one image reused at two ratios.
+  // Falls back to bannerImageUrl when unset, so setting only the desktop
+  // image still works instead of showing nothing on mobile.
+  mobileBannerImageUrl: z.string().nullable(),
 })
 export type HeroContent = z.infer<typeof heroContentSchema>
 const heroDefault: HeroContent = {
@@ -36,6 +42,7 @@ const heroDefault: HeroContent = {
   secondaryButtonHref: "/lookbook",
   scrollHint: "Scroll To Explore",
   bannerImageUrl: "/hero/banner.png",
+  mobileBannerImageUrl: null,
 }
 
 // ---- process ----

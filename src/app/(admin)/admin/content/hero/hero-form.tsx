@@ -16,11 +16,12 @@ export function HeroForm({ defaultValues }: { defaultValues: HeroContent }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [bannerImageUrl, setBannerImageUrl] = useState(defaultValues.bannerImageUrl)
+  const [mobileBannerImageUrl, setMobileBannerImageUrl] = useState(defaultValues.mobileBannerImageUrl)
   const { register, handleSubmit } = useForm<HeroContent>({ defaultValues })
 
   async function onSubmit(values: HeroContent) {
     setSubmitting(true)
-    const result = await saveSiteContent("hero", { ...values, bannerImageUrl })
+    const result = await saveSiteContent("hero", { ...values, bannerImageUrl, mobileBannerImageUrl })
     setSubmitting(false)
 
     if (!result.ok) {
@@ -33,7 +34,18 @@ export function HeroForm({ defaultValues }: { defaultValues: HeroContent }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <ImageUploadField label="Banner image" value={bannerImageUrl} onChange={setBannerImageUrl} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <ImageUploadField label="Banner image (desktop, 16:9)" value={bannerImageUrl} onChange={setBannerImageUrl} />
+        <ImageUploadField
+          label="Banner image (mobile, 9:16)"
+          value={mobileBannerImageUrl}
+          onChange={setMobileBannerImageUrl}
+        />
+      </div>
+      <Caption className="block">
+        Mobile falls back to the desktop image if left empty — a portrait-cropped version usually reads better on
+        phones than a wide shot stretched to fit.
+      </Caption>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
