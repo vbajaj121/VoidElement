@@ -117,7 +117,7 @@ export function Navbar() {
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
         <SheetContent side="right" className="glass w-full sm:max-w-xs">
           <SheetHeader>
-            <SheetTitle className="font-serif text-xl italic">Menu</SheetTitle>
+            <SheetTitle className="text-xl italic">Menu</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col gap-1 px-6">
             {links.map((link) => (

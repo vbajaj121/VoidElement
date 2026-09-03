@@ -22,7 +22,7 @@ function Eyebrow<T extends React.ElementType = "p">({
   )
 }
 
-/** The huge editorial serif — reserved for hero moments, one or two per page. */
+/** The huge editorial display size — reserved for hero moments, one or two per page. */
 function Display<T extends React.ElementType = "h1">({
   as,
   className,
@@ -31,16 +31,13 @@ function Display<T extends React.ElementType = "h1">({
   const Comp = as || "h1"
   return (
     <Comp
-      className={cn(
-        "text-display font-serif text-balance text-soft-white",
-        className
-      )}
+      className={cn("text-display text-balance text-soft-white", className)}
       {...props}
     />
   )
 }
 
-/** Section-level heading — serif, smaller and quieter than Display. */
+/** Section-level heading — smaller and quieter than Display. */
 function Heading<T extends React.ElementType = "h2">({
   as,
   className,
@@ -49,10 +46,7 @@ function Heading<T extends React.ElementType = "h2">({
   const Comp = as || "h2"
   return (
     <Comp
-      className={cn(
-        "text-h1 font-serif text-balance text-soft-white",
-        className
-      )}
+      className={cn("text-h1 text-balance text-soft-white", className)}
       {...props}
     />
   )

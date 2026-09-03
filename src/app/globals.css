@@ -9,8 +9,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-serif);
-  --font-serif: var(--font-serif);
+  /* One typeface everywhere — shadcn's Sheet/Dialog/Card primitives use
+     font-heading for their title slots, so this stays mapped to the same
+     sans font rather than a second, now-removed serif. */
+  --font-heading: var(--font-sans);
 
   --color-matte-black: var(--matte-black);
   --color-carbon: var(--carbon);

@@ -23,7 +23,7 @@ export function CartDrawer() {
     <Sheet open={isOpen} onOpenChange={(v) => (v ? undefined : close())}>
       <SheetContent side="right" className="glass w-full sm:max-w-md">
         <SheetHeader>
-          <SheetTitle className="font-serif text-2xl">Your Bag</SheetTitle>
+          <SheetTitle className="text-2xl">Your Bag</SheetTitle>
         </SheetHeader>
 
         {lines.length === 0 ? (

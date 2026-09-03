@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Instrument_Sans, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { LazyMotionProvider } from "@/components/motion/lazy-motion-provider";
@@ -7,21 +7,21 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
+// One typeface everywhere, including what used to be the separate serif
+// display font — swapped from Geist (a clean but neutral dev-tool grotesk)
+// for something warmer and more editorial that matches the quiet-luxury,
+// moody-photography brand vibe. Italic included since Display headings
+// still use it — without it, "italic" utility classes would fall back to
+// a browser-synthesized (faux) oblique instead of true italic glyphs.
+const instrumentSans = Instrument_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["opsz", "SOFT", "WONK"],
 });
 
 const DEFAULT_TITLE = "VOID ELEMENT — Wear the Unrepeatable";
@@ -68,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${instrumentSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">

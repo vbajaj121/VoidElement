@@ -68,7 +68,7 @@ export default function StyleGuidePage() {
               <Eyebrow className="mt-2">FW25 Collection — Drop 002</Eyebrow>
             </div>
             <div>
-              <Caption>Display (font-serif)</Caption>
+              <Caption>Display</Caption>
               <Display className="mt-2">Some things aren&apos;t meant to stay hidden.</Display>
             </div>
             <div>
