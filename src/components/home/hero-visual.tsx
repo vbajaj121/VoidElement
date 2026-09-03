@@ -31,23 +31,17 @@ export function HeroVisual({
       )}
 
       {mobileSrc ? (
-        <Image
-          src={mobileSrc}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover lg:hidden"
-        />
+        <Image src={mobileSrc} alt="" fill priority sizes="100vw" className="object-cover lg:hidden" />
       ) : (
         <div className="h-full w-full lg:hidden">
           <HeroArt />
         </div>
       )}
 
-      {/* Scrim for text legibility over an arbitrary uploaded photo — same
-          treatment at both ratios since text overlays the image at both. */}
-      <div className="from-matte-black via-matte-black/60 to-matte-black/20 absolute inset-0 bg-gradient-to-t" />
+      {/* Only desktop overlays text on the photo now — mobile is image-only
+          — but a bottom scrim on both keeps this section blending into the
+          one below instead of cutting off sharply. */}
+      <div className="from-matte-black via-matte-black/30 absolute inset-0 bg-gradient-to-t to-transparent" />
     </div>
   )
 }

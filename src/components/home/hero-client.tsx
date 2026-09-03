@@ -5,10 +5,8 @@ import { m } from "framer-motion"
 import Link from "next/link"
 import { ArrowRight, ChevronDown } from "lucide-react"
 import { AuroraBackground } from "@/components/ui/aurora-background"
-import { Button } from "@/components/ui/button"
 import { Container } from "@/components/layout/container"
 import { HeroVisual } from "@/components/home/hero-visual"
-import { Magnetic } from "@/components/motion/magnetic"
 import { Eyebrow, Display, Lead, Caption } from "@/components/ui/typography"
 import { useParallax } from "@/hooks/use-parallax"
 import type { HeroContent } from "@/lib/validation/site-content"
@@ -20,12 +18,8 @@ export function HeroClient({ content }: { content: HeroContent }) {
   // mousemove to react to — x/y just sit at 0 forever), but the motion.div
   // wrapper still applies a CSS transform for it, and AuroraBackground itself
   // runs a continuous CSS animation through a 120px blur — one of the most
-  // GPU-expensive effects a browser renders. Both sit directly under the
-  // fixed navbar, the exact area where taps on the menu/cart buttons were
-  // reported as unreliable, and on real (especially mid-range Android)
-  // mobile hardware that's a plausible source of genuine input jank for a
-  // purely decorative desktop nicety. Skip both entirely on coarse-pointer/
-  // touch devices — same detection CustomCursor already uses.
+  // GPU-expensive effects a browser renders. Skip both entirely on coarse-
+  // pointer/touch devices — same detection CustomCursor already uses.
   const [finePointer, setFinePointer] = useState(false)
   useEffect(() => {
     // matchMedia is unavailable during SSR, so this can only be known
@@ -42,10 +36,12 @@ export function HeroClient({ content }: { content: HeroContent }) {
   }
 
   return (
-    // Sized by aspect ratio instead of viewport height — 9:16 (portrait) on
-    // mobile, 16:9 (landscape) on desktop, matching the two differently-
-    // cropped banner images admins upload for each.
-    <section className="relative aspect-[9/16] w-full overflow-hidden lg:aspect-video">
+    // Square on mobile (a near-full-screen 9:16 photo, then an inset story
+    // card, both didn't land) — image-only, no text/CTA on top of it at
+    // all, roughly half the height the original 9:16 treatment took so the
+    // marquee and product grid are visible on the same first screen. 16:9
+    // on desktop, unchanged.
+    <section className="relative aspect-square w-full overflow-hidden lg:aspect-video">
       {finePointer && (
         <m.div style={{ x, y }} className="pointer-events-none absolute inset-0">
           <AuroraBackground className="-top-1/4 left-1/2 -translate-x-1/2 opacity-[0.12]" />
@@ -64,12 +60,7 @@ export function HeroClient({ content }: { content: HeroContent }) {
       {/* Dissolves the hero into the section below instead of cutting off sharply */}
       <div className="from-matte-black to-matte-black/0 pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-56 bg-gradient-to-t" />
 
-      {/* Desktop only — mobile drops the eyebrow/headline/subtext/lookbook
-          entirely and just gets the one transparent button below. Text
-          links instead of filled pill buttons — a solid gold CTA read as a
-          loud sale-banner accent against this quiet, single-light-source
-          photograph; a thin underline + arrow sits with it instead of
-          fighting it. */}
+      {/* Desktop only — mobile is the photo alone, no text or CTA over it. */}
       <div className="relative z-10 hidden h-full w-full items-center lg:flex">
         <Container>
           <div className="max-w-2xl">
@@ -109,32 +100,13 @@ export function HeroClient({ content }: { content: HeroContent }) {
         </Container>
       </div>
 
-      {/* Mobile only — just the one transparent CTA, sitting above the
-          scroll hint near the bottom of the banner. */}
-      <div className="absolute inset-x-0 bottom-24 z-10 flex justify-center lg:hidden">
-        <Magnetic>
-          <Button
-            render={<Link href={content.primaryButtonHref} data-cursor="hover" />}
-            nativeButton={false}
-            variant="luxury"
-            size="xl"
-          >
-            {content.primaryButtonLabel}
-          </Button>
-        </Magnetic>
-      </div>
-
+      {/* Scroll hint — desktop only, mobile's short square crop doesn't need it. */}
       <button
         type="button"
         onClick={scrollToNext}
         data-cursor="text"
         data-cursor-label="Scroll"
-        // `left-1/2 -translate-x-1/2` instead of `inset-x-0` — inset-x-0
-        // stretched the button's actual hit box to the full viewport width
-        // (only its centered text was ever visible), an invisible tap strip
-        // sitting under whatever's above it. This keeps the same visual
-        // centering while shrinking the clickable area to the content itself.
-        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-warm-grey"
+        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-warm-grey lg:flex"
       >
         <Caption className="tracking-[0.3em] uppercase">{content.scrollHint}</Caption>
         <ChevronDown className="animate-bounce" size={20} strokeWidth={1.5} />
