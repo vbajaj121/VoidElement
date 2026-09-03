@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { m } from "framer-motion"
 import Link from "next/link"
-import { ChevronDown } from "lucide-react"
+import { ArrowRight, ChevronDown } from "lucide-react"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { Button } from "@/components/ui/button"
 import { Container } from "@/components/layout/container"
@@ -64,45 +64,64 @@ export function HeroClient({ content }: { content: HeroContent }) {
       {/* Dissolves the hero into the section below instead of cutting off sharply */}
       <div className="from-matte-black to-matte-black/0 pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-56 bg-gradient-to-t" />
 
-      <div className="relative z-10 flex h-full w-full items-center">
+      {/* Desktop only — mobile drops the eyebrow/headline/subtext/lookbook
+          entirely and just gets the one transparent button below. Text
+          links instead of filled pill buttons — a solid gold CTA read as a
+          loud sale-banner accent against this quiet, single-light-source
+          photograph; a thin underline + arrow sits with it instead of
+          fighting it. */}
+      <div className="relative z-10 hidden h-full w-full items-center lg:flex">
         <Container>
-          <div className="flex flex-col items-center text-center lg:max-w-xl lg:items-start lg:text-left">
-            <Eyebrow as="p" className="mb-6">
+          <div className="max-w-2xl">
+            <Eyebrow as="p" className="mb-6 text-sm">
               {content.eyebrow}
             </Eyebrow>
 
-            <Display as="h1" className="italic">
+            {/* Sized up from Display's default clamp — the hero box is
+                shorter now (aspect-video instead of full viewport height),
+                so the same absolute text size read smaller relative to it. */}
+            <Display as="h1" className="text-6xl italic xl:text-8xl">
               {content.headline}
             </Display>
 
-            <Lead as="p" className="mt-6 max-w-lg">
+            <Lead as="p" className="mt-6 max-w-lg text-lg xl:text-xl">
               {content.subtext}
             </Lead>
 
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Magnetic>
-                <Button
-                  render={<Link href={content.primaryButtonHref} data-cursor="hover" />}
-                  nativeButton={false}
-                  variant="luxury-filled"
-                  size="xl"
-                >
-                  {content.primaryButtonLabel}
-                </Button>
-              </Magnetic>
-              <Magnetic>
-                <Button
-                  render={<Link href={content.secondaryButtonHref} data-cursor="hover" />}
-                  nativeButton={false}
-                  variant="luxury"
-                  size="xl"
-                >
-                  {content.secondaryButtonLabel}
-                </Button>
-              </Magnetic>
+            <div className="mt-10 flex items-center gap-8">
+              <Link
+                href={content.primaryButtonHref}
+                data-cursor="hover"
+                className="group border-soft-white text-soft-white hover:text-accent-champagne hover:border-accent-champagne inline-flex items-center gap-2 border-b pb-1 text-sm font-medium tracking-[0.2em] uppercase transition-colors"
+              >
+                {content.primaryButtonLabel}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
+              </Link>
+              <Link
+                href={content.secondaryButtonHref}
+                data-cursor="hover"
+                className="text-warm-grey hover:text-soft-white text-sm font-medium tracking-[0.2em] uppercase transition-colors"
+              >
+                {content.secondaryButtonLabel}
+              </Link>
             </div>
           </div>
         </Container>
+      </div>
+
+      {/* Mobile only — just the one transparent CTA, sitting above the
+          scroll hint near the bottom of the banner. */}
+      <div className="absolute inset-x-0 bottom-24 z-10 flex justify-center lg:hidden">
+        <Magnetic>
+          <Button
+            render={<Link href={content.primaryButtonHref} data-cursor="hover" />}
+            nativeButton={false}
+            variant="luxury"
+            size="xl"
+          >
+            {content.primaryButtonLabel}
+          </Button>
+        </Magnetic>
       </div>
 
       <button
