@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import { m } from "framer-motion"
-import { LogoMark } from "@/components/brand/logo"
 import { StaggerGroup, StaggerItem } from "@/components/motion/stagger-group"
 import { ProductCard } from "@/components/commerce/product-card"
 import type { MockProduct } from "@/lib/data/products"
@@ -43,9 +43,12 @@ export function DropReveal({
   useEffect(() => {
     if (!enabled) return
     try {
-      const openedDropId = localStorage.getItem(STORAGE_KEY)
+      // In dev, always show it regardless of what's stored — no clearing
+      // localStorage between test reloads while this is being built out.
+      // Real visitors in production still only see it once per dropId.
+      const alreadySeen = process.env.NODE_ENV !== "development" && localStorage.getItem(STORAGE_KEY) === dropId
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      if (openedDropId === dropId || reducedMotion) return
+      if (alreadySeen || reducedMotion) return
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowBox(true)
     } catch {
@@ -157,25 +160,15 @@ export function DropReveal({
         {phase !== "idle" && (
           <m.div
             aria-hidden
-            className="pointer-events-none absolute -top-14 left-1/2 -translate-x-1/2"
+            className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2"
             animate={
               phase === "landed"
-                ? { x: 90, y: -70, rotate: 40, opacity: 0 }
+                ? { x: 110, y: -90, rotate: 40, opacity: 0 }
                 : { x: 0, y: 0, rotate: 0, opacity: 1 }
             }
             transition={{ duration: phase === "landed" ? 0.8 : 0, ease: "easeIn" }}
           >
-            <div
-              className="from-carbon to-matte-black h-9 w-24 rounded-t-full border-b-0 bg-gradient-to-b"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(90deg, color-mix(in oklch, var(--accent-champagne) 35%, transparent) 0 2px, transparent 2px 12px)",
-              }}
-            />
-            <svg viewBox="0 0 96 40" className="absolute top-7 left-0 h-10 w-24 overflow-visible" aria-hidden>
-              <line x1="4" y1="0" x2="34" y2="38" stroke="var(--accent-champagne)" strokeWidth="1" opacity="0.6" />
-              <line x1="92" y1="0" x2="62" y2="38" stroke="var(--accent-champagne)" strokeWidth="1" opacity="0.6" />
-            </svg>
+            <Image src="/drop/parachute.png" alt="" width={200} height={216} priority />
           </m.div>
         )}
 
@@ -184,14 +177,11 @@ export function DropReveal({
           onClick={handleOpen}
           data-cursor="hover"
           aria-label="Open the drop"
-          className="relative flex h-40 w-56 flex-col transition-transform hover:scale-[1.03]"
+          className="relative transition-transform hover:scale-[1.03]"
           animate={phase === "landed" ? { scaleY: [1, 0.82, 1.05, 1] } : undefined}
           transition={phase === "landed" ? { duration: 0.4, ease: "easeOut" } : undefined}
         >
-          <div className="from-carbon to-matte-black absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b" />
-          <div className="from-carbon to-matte-black absolute inset-x-0 bottom-0 h-1/2 rounded-b-xl bg-gradient-to-t" />
-          <div className="bg-accent-champagne absolute inset-y-0 left-1/2 w-3 -translate-x-1/2" />
-          <LogoMark className="text-accent-champagne relative m-auto size-12" />
+          <Image src="/drop/crate.png" alt="" width={180} height={183} priority />
         </m.button>
 
         {phase === "idle" && (
