@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Caption } from "@/components/ui/typography"
 import { ImageUploadField } from "@/components/admin/image-upload-field"
+import { VideoUploadField } from "@/components/admin/video-upload-field"
 import { saveSiteContent } from "../actions"
 import type { HeroContent } from "@/lib/validation/site-content"
 
@@ -17,11 +18,17 @@ export function HeroForm({ defaultValues }: { defaultValues: HeroContent }) {
   const [submitting, setSubmitting] = useState(false)
   const [bannerImageUrl, setBannerImageUrl] = useState(defaultValues.bannerImageUrl)
   const [mobileBannerImageUrl, setMobileBannerImageUrl] = useState(defaultValues.mobileBannerImageUrl)
+  const [mobileVideoUrl, setMobileVideoUrl] = useState(defaultValues.mobileVideoUrl)
   const { register, handleSubmit } = useForm<HeroContent>({ defaultValues })
 
   async function onSubmit(values: HeroContent) {
     setSubmitting(true)
-    const result = await saveSiteContent("hero", { ...values, bannerImageUrl, mobileBannerImageUrl })
+    const result = await saveSiteContent("hero", {
+      ...values,
+      bannerImageUrl,
+      mobileBannerImageUrl,
+      mobileVideoUrl,
+    })
     setSubmitting(false)
 
     if (!result.ok) {
@@ -45,6 +52,13 @@ export function HeroForm({ defaultValues }: { defaultValues: HeroContent }) {
       <Caption className="block">
         Mobile falls back to the desktop image if left empty — a portrait-cropped version usually reads better on
         phones than a wide shot stretched to fit.
+      </Caption>
+
+      <VideoUploadField label="Mobile video (optional, 9:16)" value={mobileVideoUrl} onChange={setMobileVideoUrl} />
+      <Caption className="block">
+        A short, looping background clip for mobile — takes over from the mobile banner image above when set (which
+        still shows as the poster frame while it loads). Keep it under 30MB and a few seconds long; it plays muted
+        and on a loop, with no sound or controls.
       </Caption>
 
       <div className="grid gap-4 sm:grid-cols-2">

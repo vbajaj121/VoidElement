@@ -12,10 +12,11 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       // Default is 1MB — too small for real product/content photos (a
-      // phone camera easily produces 3-10MB), which silently fail at the
-      // framework level before uploadProductImage's own 10MB check ever
-      // runs. Leaves headroom over that 10MB check for multipart overhead.
-      bodySizeLimit: "11mb",
+      // phone camera easily produces 3-10MB) or the short hero video clip,
+      // which would silently fail at the framework level before the
+      // upload actions' own size checks ever run. Sized for the video
+      // check's 30MB limit, with headroom for multipart overhead.
+      bodySizeLimit: "35mb",
     },
   },
 };

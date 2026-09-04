@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db/prisma'
 import { logger } from '@/lib/logger'
 import { requireAdmin, type ActionResult } from '../actions'
 import { SITE_CONTENT_SECTIONS, type SiteContentSection } from '@/lib/validation/site-content'
-import { isCloudinaryConfigured, uploadImageBuffer } from '@/lib/cloudinary'
+import { isCloudinaryConfigured, uploadImageBuffer, uploadVideoBuffer } from '@/lib/cloudinary'
 
 const PUBLIC_PATHS_BY_SECTION: Record<SiteContentSection, string[]> = {
   hero: ['/'],
@@ -78,6 +78,34 @@ export async function uploadContentImage(formData: FormData): Promise<UploadImag
     return { ok: true, url }
   } catch (err) {
     logger.error('admin.upload_content_image_failed', { err: String(err) })
+    return { ok: false, error: 'Upload failed. Try again.' }
+  }
+}
+
+export async function uploadContentVideo(formData: FormData): Promise<UploadImageResult> {
+  await requireAdmin()
+
+  if (!isCloudinaryConfigured()) {
+    return { ok: false, error: 'Video uploads are not configured yet. Add Cloudinary credentials to enable this.' }
+  }
+
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: 'No file was selected.' }
+  }
+  if (!file.type.startsWith('video/')) {
+    return { ok: false, error: 'Only video files are supported.' }
+  }
+  if (file.size > 30 * 1024 * 1024) {
+    return { ok: false, error: 'Video must be under 30MB — keep the clip short.' }
+  }
+
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const url = await uploadVideoBuffer(buffer, 'site-content')
+    return { ok: true, url }
+  } catch (err) {
+    logger.error('admin.upload_content_video_failed', { err: String(err) })
     return { ok: false, error: 'Upload failed. Try again.' }
   }
 }

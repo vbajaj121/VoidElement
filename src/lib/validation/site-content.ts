@@ -30,6 +30,10 @@ export const heroContentSchema = z.object({
   // Falls back to bannerImageUrl when unset, so setting only the desktop
   // image still works instead of showing nothing on mobile.
   mobileBannerImageUrl: z.string().nullable(),
+  // Takes over from mobileBannerImageUrl on mobile when set — a short,
+  // looping, muted background clip instead of a static photo. The image
+  // still serves as the <video>'s poster frame while the clip loads.
+  mobileVideoUrl: z.string().nullable(),
 })
 export type HeroContent = z.infer<typeof heroContentSchema>
 const heroDefault: HeroContent = {
@@ -43,6 +47,7 @@ const heroDefault: HeroContent = {
   scrollHint: "Scroll To Explore",
   bannerImageUrl: "/hero/banner.png",
   mobileBannerImageUrl: null,
+  mobileVideoUrl: null,
 }
 
 // ---- process ----

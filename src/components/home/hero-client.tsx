@@ -36,31 +36,47 @@ export function HeroClient({ content }: { content: HeroContent }) {
   }
 
   return (
-    // Square on mobile (a near-full-screen 9:16 photo, then an inset story
-    // card, both didn't land) — image-only, no text/CTA on top of it at
-    // all, roughly half the height the original 9:16 treatment took so the
-    // marquee and product grid are visible on the same first screen. 16:9
-    // on desktop, unchanged.
-    <section className="relative aspect-square w-full overflow-hidden lg:aspect-video">
+    // Back to 9:16 on mobile (was briefly square, for a more compact hero)
+    // — the mobile video clip is shot 9:16, and cropping that into a square
+    // frame would lose too much of it. 16:9 on desktop, unchanged.
+    <section className="relative aspect-[9/16] w-full overflow-hidden lg:aspect-video">
       {finePointer && (
         <m.div style={{ x, y }} className="pointer-events-none absolute inset-0">
           <AuroraBackground className="-top-1/4 left-1/2 -translate-x-1/2 opacity-[0.12]" />
         </m.div>
       )}
 
-      <HeroVisual bannerImageUrl={content.bannerImageUrl} mobileBannerImageUrl={content.mobileBannerImageUrl} />
+      <HeroVisual
+        bannerImageUrl={content.bannerImageUrl}
+        mobileBannerImageUrl={content.mobileBannerImageUrl}
+        mobileVideoUrl={content.mobileVideoUrl}
+      />
 
       {/* Grid runs over the image too, instead of stopping at its edge — one
           continuous surface rather than a photo dropped onto a separate grid.
           Plain alpha, no blend mode: mix-blend-overlay mathematically has ~no
           effect against a near-black base (the formula collapses to zero at
-          that extreme), which is why it was invisible here before. */}
-      <div className="void-grid pointer-events-none absolute inset-0 z-[4]" />
+          that extreme), which is why it was invisible here before. Desktop
+          only — mobile's photo/video shows uncut. */}
+      <div className="void-grid pointer-events-none absolute inset-0 z-[4] hidden lg:block" />
 
       {/* Dissolves the hero into the section below instead of cutting off sharply */}
       <div className="from-matte-black to-matte-black/0 pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-56 bg-gradient-to-t" />
 
-      {/* Desktop only — mobile is the photo alone, no text or CTA over it. */}
+      {/* Mobile only — just the one transparent CTA, no headline/subtext
+          over the photo or video. */}
+      <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center lg:hidden">
+        <Link
+          href={content.primaryButtonHref}
+          data-cursor="hover"
+          className="group border-soft-white text-soft-white hover:text-accent-champagne hover:border-accent-champagne inline-flex items-center gap-2 border-b pb-1 text-sm font-medium tracking-[0.2em] uppercase transition-colors"
+        >
+          {content.primaryButtonLabel}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
+        </Link>
+      </div>
+
+      {/* Desktop only — the full eyebrow/headline/subtext/links treatment. */}
       <div className="relative z-10 hidden h-full w-full items-center lg:flex">
         <Container>
           <div className="max-w-2xl">
@@ -68,10 +84,10 @@ export function HeroClient({ content }: { content: HeroContent }) {
               {content.eyebrow}
             </Eyebrow>
 
-            {/* Sized up from Display's default clamp — the hero box is
-                shorter now (aspect-video instead of full viewport height),
-                so the same absolute text size read smaller relative to it. */}
-            <Display as="h1" className="text-6xl italic xl:text-8xl">
+            {/* Smaller, uppercase, non-italic — matches the wordmark
+                treatment in the navbar logo instead of the large italic
+                Display style used elsewhere (LimitedEdition, etc). */}
+            <Display as="h1" className="text-3xl font-semibold tracking-wide uppercase xl:text-5xl">
               {content.headline}
             </Display>
 

@@ -34,3 +34,25 @@ export async function uploadImageBuffer(
     stream.end(buffer)
   })
 }
+
+export async function uploadVideoBuffer(
+  buffer: Buffer,
+  folder: string,
+  options?: { publicId?: string; overwrite?: boolean }
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: 'video',
+        public_id: options?.publicId,
+        overwrite: options?.overwrite ?? true,
+      },
+      (error, result) => {
+        if (error || !result) return reject(error ?? new Error('Cloudinary upload returned no result.'))
+        resolve(result.secure_url)
+      }
+    )
+    stream.end(buffer)
+  })
+}
